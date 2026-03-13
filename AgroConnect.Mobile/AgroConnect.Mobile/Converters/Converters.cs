@@ -32,3 +32,20 @@ public class InvertBoolConverter : IValueConverter
     public object? Convert(object? value, Type t, object? p, CultureInfo c) => value is bool b ? !b : value;
     public object? ConvertBack(object? value, Type t, object? p, CultureInfo c) => value is bool b ? !b : value;
 }
+
+/// <summary>Devuelve true si el string no es null ni vacío (para IsVisible en labels de error)</summary>
+public class StringNotNullOrEmptyConverter : IValueConverter
+{
+    public object Convert(object? value, Type t, object? p, CultureInfo c)
+        => value is string s && !string.IsNullOrEmpty(s);
+    public object ConvertBack(object? value, Type t, object? p, CultureInfo c)
+        => throw new NotImplementedException();
+}
+
+public class ExecutionStatusToColorConverter : IValueConverter
+{
+    public object? Convert(object? value, Type t, object? p, CultureInfo c)
+        => StatusHelper.GetExecutionStatusColor(value as string);
+    public object? ConvertBack(object? value, Type t, object? p, CultureInfo c)
+        => throw new NotImplementedException();
+}

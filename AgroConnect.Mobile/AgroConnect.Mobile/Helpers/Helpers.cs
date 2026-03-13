@@ -5,14 +5,19 @@ namespace AgroConnect.Mobile.Helpers;
 public static class Constants
 {
 #if DEBUG
-    public const string ApiBaseUrl = "https://10.0.2.2:7001/api";
+    // Dispositivo físico: usar IP local del PC en la misma red
+    // Emulador Android: cambiar a https://10.0.2.2:7250/api/
+    public const string ApiBaseUrl = "https://192.168.0.219:7250/api/";
 #else
-    public const string ApiBaseUrl = "https://agroconnect.digital/api";
+    public const string ApiBaseUrl = "https://agroconnect.digital/api/";
 #endif
 
+    // ── SecureStorage keys ──
     public const string TokenKey = "auth_token";
-    public const string RefreshTokenKey = "auth_refresh_token";
-    public const string UserInfoKey = "user_info";
+    public const string TokenExpiresKey = "auth_token_expires";
+    public const string LoginDataKey = "auth_login_data";
+
+    // ── Defaults ──
     public static readonly TimeSpan HttpTimeout = TimeSpan.FromSeconds(30);
     public const double DefaultLatitude = -32.69;
     public const double DefaultLongitude = -62.10;
@@ -53,6 +58,7 @@ public static class DateHelper
 
 public static class StatusHelper
 {
+    // ── Estados de receta (consistentes con web) ──
     public static Color GetStatusColor(string? status) => status?.ToUpperInvariant() switch
     {
         "ABIERTA" => Color.FromArgb("#FFC107"),
@@ -60,11 +66,38 @@ public static class StatusHelper
         "APROBADA" => Color.FromArgb("#4CAF50"),
         "RECHAZADA" => Color.FromArgb("#F44336"),
         "OBSERVADA" => Color.FromArgb("#FF9800"),
+        "REDIRIGIDA" => Color.FromArgb("#9C27B0"),
         "CERRADA" => Color.FromArgb("#9E9E9E"),
         "ANULADA" => Color.FromArgb("#F44336"),
         _ => Color.FromArgb("#FFC107")
     };
 
+    // ── Estados de ejecución ──
+    public static Color GetExecutionStatusColor(string? status) => status?.ToUpperInvariant() switch
+    {
+        "ASIGNADA" => Color.FromArgb("#FFC107"),
+        "ACEPTADA" => Color.FromArgb("#2196F3"),
+        "EN_CAMINO" => Color.FromArgb("#03A9F4"),
+        "EN_PROGRESO" => Color.FromArgb("#4CAF50"),
+        "PAUSADA" => Color.FromArgb("#FF9800"),
+        "COMPLETADA" => Color.FromArgb("#2E7D32"),
+        "CANCELADA" => Color.FromArgb("#F44336"),
+        _ => Color.FromArgb("#9E9E9E")
+    };
+
+    public static string GetExecutionStatusLabel(string? status) => status?.ToUpperInvariant() switch
+    {
+        "ASIGNADA" => "Asignada",
+        "ACEPTADA" => "Aceptada",
+        "EN_CAMINO" => "En camino",
+        "EN_PROGRESO" => "En progreso",
+        "PAUSADA" => "Pausada",
+        "COMPLETADA" => "Completada",
+        "CANCELADA" => "Cancelada",
+        _ => status ?? "—"
+    };
+
+    // ── Clase toxicológica ──
     public static Color GetToxColor(string? toxClass) => toxClass?.ToUpperInvariant() switch
     {
         "IA" => Color.FromArgb("#9C27B0"),
@@ -75,6 +108,7 @@ public static class StatusHelper
         _ => Color.FromArgb("#9E9E9E")
     };
 
+    // ── Riesgo territorial ──
     public static Color GetRiskColor(string? risk) => risk?.ToUpperInvariant() switch
     {
         "ALTO" => Color.FromArgb("#F44336"),
@@ -90,6 +124,7 @@ public static class StatusHelper
         "APROBADA" => "Aprobada",
         "RECHAZADA" => "Rechazada",
         "OBSERVADA" => "Observada",
+        "REDIRIGIDA" => "Redirigida",
         "CERRADA" => "Cerrada",
         "ANULADA" => "Anulada",
         _ => status ?? "—"

@@ -28,9 +28,9 @@
                             <Label Grid.Row="0" Grid.Column="0" FontAttributes="Bold" FontSize="16">
                                 <Label.FormattedText>
                                     <FormattedString>
-                                        <Span Text="{Binding Code}" />
+                                        <Span Text="{Binding PublicCode}" />
                                         <Span Text=" · " TextColor="{StaticResource TextSecondary}" />
-                                        <Span Text="{Binding CropName}" TextColor="{StaticResource TextSecondary}" />
+                                        <Span Text="{Binding Crop}" TextColor="{StaticResource TextSecondary}" />
                                     </FormattedString>
                                 </Label.FormattedText>
                             </Label>
@@ -38,8 +38,8 @@
                                 <Label Text="{Binding Status}" TextColor="White" FontSize="12" FontAttributes="Bold" />
                             </Border>
                             <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding AdvisorName}" Style="{StaticResource CaptionLabel}" />
-                            <Label Grid.Row="2" Grid.Column="0" Text="{Binding ApplicationDate, Converter={StaticResource DateToArg}}" Style="{StaticResource CaptionLabel}" />
-                            <Label Grid.Row="2" Grid.Column="1" Text="{Binding MunicipalityName}" Style="{StaticResource CaptionLabel}" HorizontalTextAlignment="End" />
+                            <Label Grid.Row="2" Grid.Column="0" Text="{Binding IssueDate, Converter={StaticResource DateToArg}}" Style="{StaticResource CaptionLabel}" />
+                            <Label Grid.Row="2" Grid.Column="1" Text="{Binding AssignedMunicipalityName}" Style="{StaticResource CaptionLabel}" HorizontalTextAlignment="End" />
                         </Grid>
                     </Frame>
                 </DataTemplate>

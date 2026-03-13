@@ -9,14 +9,15 @@
              BackgroundColor="{StaticResource Background}">
     <ContentPage.Resources>
         <conv:InvertBoolConverter x:Key="InvertBool" />
+        <conv:StringNotNullOrEmptyConverter x:Key="StringNotEmpty" />
     </ContentPage.Resources>
     <ScrollView>
         <VerticalStackLayout Spacing="20" Padding="30" VerticalOptions="Center">
             <Label Text="AgroConnect" Style="{StaticResource TitleLabel}" HorizontalOptions="Center" FontSize="28" />
             <Label Text="Gestión fitosanitaria municipal" Style="{StaticResource SubtitleLabel}" HorizontalOptions="Center" />
-            <Entry Placeholder="Usuario" Text="{Binding UserName}" Style="{StaticResource FormEntry}" ReturnType="Next" />
+            <Entry Placeholder="Email" Text="{Binding Email}" Style="{StaticResource FormEntry}" Keyboard="Email" ReturnType="Next" />
             <Entry Placeholder="Contraseña" Text="{Binding Password}" Style="{StaticResource FormEntry}" IsPassword="True" ReturnType="Done" />
-            <Label Text="{Binding ErrorMessage}" TextColor="{StaticResource Error}" IsVisible="{Binding ErrorMessage, Converter={StaticResource InvertBool}}" HorizontalOptions="Center" FontSize="14" />
+            <Label Text="{Binding ErrorMessage}" TextColor="{StaticResource Error}" IsVisible="{Binding ErrorMessage, Converter={StaticResource StringNotEmpty}}" HorizontalOptions="Center" FontSize="14" />
             <Button Text="Iniciar sesión" Command="{Binding LoginCommand}" Style="{StaticResource PrimaryButton}" IsEnabled="{Binding IsBusy, Converter={StaticResource InvertBool}}" />
             <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" HorizontalOptions="Center" />
             <Label HorizontalOptions="Center" FontSize="14">

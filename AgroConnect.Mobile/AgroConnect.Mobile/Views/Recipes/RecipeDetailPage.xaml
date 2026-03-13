@@ -7,6 +7,6 @@
              Title="Detalle Receta" BackgroundColor="{StaticResource Background}">
     <VerticalStackLayout Padding="16">
         <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" />
-        <Label Text="{Binding Recipe.Code}" Style="{StaticResource TitleLabel}" />
+        <Label Text="{Binding Recipe.PublicCode}" Style="{StaticResource TitleLabel}" />
     </VerticalStackLayout>
 </ContentPage>

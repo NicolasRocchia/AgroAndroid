@@ -31,7 +31,13 @@ public class LocationService : ILocationService
             if (response?.CurrentWeather is null) return null;
 
             var w = response.CurrentWeather;
-            return new WeatherData(w.Temperature, 0, w.Windspeed, DegreesToDirection(w.Winddirection));
+            return new WeatherData
+            {
+                Temperature = w.Temperature,
+                Humidity = 0,
+                WindSpeed = w.Windspeed,
+                WindDirection = DegreesToDirection(w.Winddirection)
+            };
         }
         catch { return null; }
     }
