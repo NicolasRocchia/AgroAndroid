@@ -76,38 +76,37 @@ public class ApiService : IApiService
     /// <summary>
     /// Parsea el body de error de la API ({ error: "..." } o { errors: [...] })
     /// y lanza ApiException con el mensaje legible.
+    /// Si la API no devuelve body, usa mensajes genéricos por status code.
     /// </summary>
     private static async Task EnsureSuccessOrThrowAsync(HttpResponseMessage response)
     {
         if (response.IsSuccessStatusCode) return;
 
-        var message = response.StatusCode switch
+        // 1. Intentar parsear el error del body (prioridad sobre mensaje genérico)
+        string? message = null;
+        try
+        {
+            var body = await response.Content.ReadAsStringAsync();
+            if (!string.IsNullOrWhiteSpace(body))
+            {
+                var error = JsonSerializer.Deserialize<ApiErrorResponse>(body, JsonOptions);
+                if (!string.IsNullOrEmpty(error?.Error))
+                    message = error.Error;
+                else if (error?.Errors is { Count: > 0 })
+                    message = string.Join(". ", error.Errors);
+            }
+        }
+        catch { /* si no puede parsear, cae al fallback */ }
+
+        // 2. Fallback: mensaje genérico por status code
+        message ??= response.StatusCode switch
         {
             HttpStatusCode.Unauthorized => "Sesión expirada. Iniciá sesión nuevamente.",
             HttpStatusCode.Forbidden => "No tenés permisos para esta acción.",
             HttpStatusCode.NotFound => "No se encontró el recurso solicitado.",
-            _ => null
+            _ => $"Error del servidor ({(int)response.StatusCode})."
         };
 
-        // Intentar parsear el error del body
-        if (message is null)
-        {
-            try
-            {
-                var body = await response.Content.ReadAsStringAsync();
-                if (!string.IsNullOrWhiteSpace(body))
-                {
-                    var error = JsonSerializer.Deserialize<ApiErrorResponse>(body, JsonOptions);
-                    if (!string.IsNullOrEmpty(error?.Error))
-                        message = error.Error;
-                    else if (error?.Errors is { Count: > 0 })
-                        message = string.Join(". ", error.Errors);
-                }
-            }
-            catch { /* si no puede parsear, usa mensaje genérico */ }
-        }
-
-        message ??= $"Error del servidor ({(int)response.StatusCode}).";
         throw new ApiException(message, response.StatusCode);
     }
 }
