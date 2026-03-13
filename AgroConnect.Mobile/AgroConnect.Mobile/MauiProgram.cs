@@ -41,10 +41,12 @@ public static class MauiProgram
         builder.Services.AddTransient<IApplicatorService, ApplicatorService>();
         builder.Services.AddTransient<INotificationService, NotificationService>();
         builder.Services.AddTransient<ILocationService, LocationService>();
+        builder.Services.AddTransient<IOperatorService, OperatorService>();
 
         // ── ViewModels ──
         builder.Services.AddTransient<LoginViewModel>();
         builder.Services.AddTransient<RegisterViewModel>();
+        builder.Services.AddTransient<ChangePasswordViewModel>();
         builder.Services.AddTransient<HomeViewModel>();
         builder.Services.AddTransient<JobListViewModel>();
         builder.Services.AddTransient<ExecutionListViewModel>();
@@ -55,10 +57,11 @@ public static class MauiProgram
         // ── Pages ──
         builder.Services.AddTransient<LoginPage>();
         builder.Services.AddTransient<RegisterPage>();
+        builder.Services.AddTransient<ChangePasswordPage>();
         builder.Services.AddTransient<HomePage>();
         builder.Services.AddTransient<JobListPage>();
         builder.Services.AddTransient<ExecutionListPage>();
-        builder.Services.AddTransient<ExecutionPage>();          // detalle (push)
+        builder.Services.AddTransient<ExecutionPage>();
         builder.Services.AddTransient<ExecutionChecklistPage>();
         builder.Services.AddTransient<ProfilePage>();
 

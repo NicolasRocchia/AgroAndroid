@@ -28,13 +28,11 @@ public class AuthService : IAuthService
         var token = await _storage.GetAsync(Constants.TokenKey);
         if (string.IsNullOrEmpty(token)) return false;
 
-        // Verificar si el token no expiró
         var expiresStr = await _storage.GetAsync(Constants.TokenExpiresKey);
         if (!string.IsNullOrEmpty(expiresStr)
             && DateTime.TryParse(expiresStr, out var expires)
             && expires <= DateTime.UtcNow)
         {
-            // Token expirado — no limpiar acá, solo reportar
             return false;
         }
 
@@ -44,13 +42,11 @@ public class AuthService : IAuthService
 
     public async Task<LoginResponse?> LoginAsync(string email, string password)
     {
-        // La API espera { email, password } — NO userName
         var response = await _api.PostAsync<LoginRequest, LoginResponse>(
             "auth/login", new(email, password));
 
         if (response is null) return null;
 
-        // Persistir en SecureStorage
         await _storage.SetAsync(Constants.TokenKey, response.Token);
         await _storage.SetAsync(Constants.TokenExpiresKey, response.ExpiresAt.ToString("O"));
         await _storage.SetAsync(Constants.LoginDataKey, JsonSerializer.Serialize(response, JsonOpts));
@@ -58,6 +54,11 @@ public class AuthService : IAuthService
         _api.SetAuthToken(response.Token);
         _cached = response;
         return response;
+    }
+
+    public async Task<RegisterResponse?> RegisterAsync(RegisterRequest request)
+    {
+        return await _api.PostAsync<RegisterRequest, RegisterResponse>("auth/register", request);
     }
 
     public async Task LogoutAsync()
@@ -92,5 +93,21 @@ public class AuthService : IAuthService
     {
         var login = await GetCachedLoginAsync();
         return login?.Roles.FirstOrDefault();
+    }
+
+    public async Task<UserProfileDto?> GetProfileAsync()
+        => await _api.GetAsync<UserProfileDto>("auth/profile");
+
+    public async Task<UserProfileDto?> UpdateProfileAsync(UpdateProfileRequest request)
+    {
+        // PutAsync throws ApiException on failure
+        await _api.PutAsync("auth/profile", request);
+        return await GetProfileAsync();
+    }
+
+    public async Task<bool> ChangePasswordAsync(ChangePasswordRequest request)
+    {
+        // PutAsync now throws ApiException on failure with the API error message
+        return await _api.PutAsync("auth/change-password", request);
     }
 }

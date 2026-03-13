@@ -5,7 +5,6 @@ namespace AgroConnect.Mobile.Services;
 
 // ══════════════════════════════════════════════════════════════
 // RECETAS
-// Endpoint base: GET /api/recipes (paginado, filtrado por rol server-side)
 // ══════════════════════════════════════════════════════════════
 
 public class RecipeService(IApiService api) : IRecipeService
@@ -30,8 +29,6 @@ public class RecipeService(IApiService api) : IRecipeService
 
 // ══════════════════════════════════════════════════════════════
 // EJECUCIÓN
-// Endpoint base: /api/executions/*
-// Todas las transiciones son POST con ExecutionTransitionRequest
 // ══════════════════════════════════════════════════════════════
 
 public class ExecutionService(IApiService api) : IExecutionService
@@ -39,6 +36,13 @@ public class ExecutionService(IApiService api) : IExecutionService
     public async Task<List<ExecutionListDto>> GetMyExecutionsAsync(string? status = null)
     {
         var url = "executions/my-executions";
+        if (!string.IsNullOrEmpty(status)) url += $"?status={status}";
+        return await api.GetAsync<List<ExecutionListDto>>(url) ?? [];
+    }
+
+    public async Task<List<ExecutionListDto>> GetMyOperatorExecutionsAsync(string? status = null)
+    {
+        var url = "executions/my-operator-executions";
         if (!string.IsNullOrEmpty(status)) url += $"?status={status}";
         return await api.GetAsync<List<ExecutionListDto>>(url) ?? [];
     }
@@ -87,7 +91,6 @@ public class ExecutionService(IApiService api) : IExecutionService
 
 // ══════════════════════════════════════════════════════════════
 // LOTES
-// Endpoint base: /api/lots/*
 // ══════════════════════════════════════════════════════════════
 
 public class LotService(IApiService api) : ILotService
@@ -104,7 +107,6 @@ public class LotService(IApiService api) : ILotService
 
 // ══════════════════════════════════════════════════════════════
 // BOLSA DE TRABAJO
-// Endpoint base: /api/jobs/*
 // ══════════════════════════════════════════════════════════════
 
 public class JobService(IApiService api) : IJobService
@@ -124,7 +126,6 @@ public class JobService(IApiService api) : IJobService
 
 // ══════════════════════════════════════════════════════════════
 // NOTIFICACIONES
-// Endpoint base: /api/notifications/*
 // ══════════════════════════════════════════════════════════════
 
 public class NotificationService(IApiService api) : INotificationService
@@ -147,7 +148,6 @@ public class NotificationService(IApiService api) : INotificationService
 
 // ══════════════════════════════════════════════════════════════
 // PERFIL APLICADOR
-// Endpoint base: /api/applicator/*
 // ══════════════════════════════════════════════════════════════
 
 public class ApplicatorService(IApiService api) : IApplicatorService
@@ -173,14 +173,43 @@ public class ApplicatorService(IApiService api) : IApplicatorService
     }
 }
 
-
 // ══════════════════════════════════════════════════════════════
 // DASHBOARD
-// Endpoint base: /api/dashboard/*
 // ══════════════════════════════════════════════════════════════
 
 public class DashboardService(IApiService api) : IDashboardService
 {
     public async Task<ApplicatorDashboardDto?> GetDashboardAsync()
         => await api.GetAsync<ApplicatorDashboardDto>("dashboard/applicator");
+}
+
+// ══════════════════════════════════════════════════════════════
+// OPERARIOS
+// ══════════════════════════════════════════════════════════════
+
+public class OperatorService(IApiService api) : IOperatorService
+{
+    public async Task<List<OperatorListDto>> GetMyOperatorsAsync()
+        => await api.GetAsync<List<OperatorListDto>>("operators") ?? [];
+
+    public async Task<OperatorDetailDto?> GetDetailAsync(long id)
+        => await api.GetAsync<OperatorDetailDto>($"operators/{id}");
+
+    public async Task<CreateOperatorResponse?> CreateAsync(CreateOperatorRequest request)
+        => await api.PostAsync<CreateOperatorRequest, CreateOperatorResponse>("operators", request);
+
+    public async Task<bool> UpdateAsync(long id, UpdateOperatorRequest request)
+        => await api.PutAsync($"operators/{id}", request);
+
+    public async Task<bool> DeactivateAsync(long id)
+    {
+        var result = await api.PostAsync<object, MessageResponse>($"operators/{id}/deactivate", new { });
+        return result is not null;
+    }
+
+    public async Task<bool> AssignToExecutionAsync(long executionId, AssignOperatorRequest request)
+    {
+        var result = await api.PostAsync<AssignOperatorRequest, object>($"executions/{executionId}/assign-operator", request);
+        return result is not null;
+    }
 }

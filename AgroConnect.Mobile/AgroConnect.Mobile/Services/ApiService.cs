@@ -62,7 +62,8 @@ public class ApiService : IApiService
     public async Task<bool> PutAsync<T>(string endpoint, T data)
     {
         var response = await _http.PutAsJsonAsync(endpoint, data, JsonOptions);
-        return response.IsSuccessStatusCode;
+        await EnsureSuccessOrThrowAsync(response);
+        return true;
     }
 
     public async Task<bool> DeleteAsync(string endpoint)

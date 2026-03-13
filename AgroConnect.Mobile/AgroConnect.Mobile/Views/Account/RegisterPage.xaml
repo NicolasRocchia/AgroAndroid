@@ -1,9 +1,107 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:AgroConnect.Mobile.ViewModels.Account"
+             xmlns:conv="clr-namespace:AgroConnect.Mobile.Converters"
              x:Class="AgroConnect.Mobile.Views.Account.RegisterPage"
-             Title="Registro" BackgroundColor="{StaticResource Background}">
-    <VerticalStackLayout Padding="30" VerticalOptions="Center">
-        <Label Text="Registro — Próximamente" Style="{StaticResource SubtitleLabel}" HorizontalOptions="Center" />
-    </VerticalStackLayout>
+             x:DataType="vm:RegisterViewModel"
+             Title="Crear cuenta" BackgroundColor="{StaticResource Background}">
+    <ContentPage.Resources>
+        <conv:InvertBoolConverter x:Key="InvertBool" />
+        <conv:StringNotNullOrEmptyConverter x:Key="StringNotEmpty" />
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="14" Padding="30" VerticalOptions="Center">
+
+            <Label Text="AgroConnect" Style="{StaticResource TitleLabel}" HorizontalOptions="Center" FontSize="28" />
+            <Label Text="Crear cuenta" Style="{StaticResource SubtitleLabel}" HorizontalOptions="Center" Margin="0,0,0,10" />
+
+            <!-- Nombre -->
+            <VerticalStackLayout Spacing="4">
+                <Label Text="Nombre completo *" FontSize="13" TextColor="{StaticResource TextSecondary}" />
+                <Entry Text="{Binding UserName}" Placeholder="Juan Pérez" Style="{StaticResource FormEntry}"
+                       ReturnType="Next" />
+            </VerticalStackLayout>
+
+            <!-- Email -->
+            <VerticalStackLayout Spacing="4">
+                <Label Text="Email *" FontSize="13" TextColor="{StaticResource TextSecondary}" />
+                <Entry Text="{Binding Email}" Placeholder="juan@email.com" Style="{StaticResource FormEntry}"
+                       Keyboard="Email" ReturnType="Next" />
+            </VerticalStackLayout>
+
+            <!-- CUIT/CUIL -->
+            <VerticalStackLayout Spacing="4">
+                <Label Text="CUIT/CUIL *" FontSize="13" TextColor="{StaticResource TextSecondary}" />
+                <Entry Text="{Binding TaxId}" Placeholder="20123456789" Style="{StaticResource FormEntry}"
+                       Keyboard="Numeric" ReturnType="Next" MaxLength="11" />
+            </VerticalStackLayout>
+
+            <!-- Teléfono -->
+            <VerticalStackLayout Spacing="4">
+                <Label Text="Teléfono (opcional)" FontSize="13" TextColor="{StaticResource TextSecondary}" />
+                <Entry Text="{Binding PhoneNumber}" Placeholder="+54 9 11 1234-5678" Style="{StaticResource FormEntry}"
+                       Keyboard="Telephone" ReturnType="Next" />
+            </VerticalStackLayout>
+
+            <!-- Contraseña -->
+            <VerticalStackLayout Spacing="4">
+                <Label Text="Contraseña * (mín. 6 caracteres)" FontSize="13" TextColor="{StaticResource TextSecondary}" />
+                <Entry Text="{Binding Password}" Placeholder="••••••" Style="{StaticResource FormEntry}"
+                       IsPassword="True" ReturnType="Next" />
+            </VerticalStackLayout>
+
+            <!-- Confirmar contraseña -->
+            <VerticalStackLayout Spacing="4">
+                <Label Text="Confirmar contraseña *" FontSize="13" TextColor="{StaticResource TextSecondary}" />
+                <Entry Text="{Binding ConfirmPassword}" Placeholder="••••••" Style="{StaticResource FormEntry}"
+                       IsPassword="True" ReturnType="Done" />
+            </VerticalStackLayout>
+
+            <!-- Tipo de cuenta -->
+            <VerticalStackLayout Spacing="4">
+                <Label Text="Tipo de cuenta" FontSize="13" TextColor="{StaticResource TextSecondary}" />
+                <Picker x:Name="RolePicker" SelectedIndexChanged="OnRoleChanged"
+                        FontSize="16" TextColor="{StaticResource TextPrimary}">
+                    <Picker.ItemsSource>
+                        <x:Array Type="{x:Type x:String}">
+                            <x:String>Aplicador</x:String>
+                            <x:String>Productor</x:String>
+                            <x:String>Ambos</x:String>
+                        </x:Array>
+                    </Picker.ItemsSource>
+                </Picker>
+            </VerticalStackLayout>
+
+            <!-- Error -->
+            <Label Text="{Binding ErrorMessage}" TextColor="{StaticResource Error}"
+                   IsVisible="{Binding ErrorMessage, Converter={StaticResource StringNotEmpty}}"
+                   HorizontalOptions="Center" FontSize="14" />
+
+            <!-- Botón registrar -->
+            <Button Text="Crear cuenta" Command="{Binding RegisterCommand}"
+                    Style="{StaticResource PrimaryButton}"
+                    IsEnabled="{Binding IsBusy, Converter={StaticResource InvertBool}}" />
+
+            <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" HorizontalOptions="Center" />
+
+            <!-- Volver al login -->
+            <Label HorizontalOptions="Center" FontSize="14">
+                <Label.FormattedText>
+                    <FormattedString>
+                        <Span Text="¿Ya tenés cuenta? " />
+                        <Span Text="Iniciar sesión" TextColor="{StaticResource Primary}" TextDecorations="Underline">
+                            <Span.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding GoToLoginCommand}" />
+                            </Span.GestureRecognizers>
+                        </Span>
+                    </FormattedString>
+                </Label.FormattedText>
+            </Label>
+
+            <BoxView HeightRequest="30" Color="Transparent" />
+
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

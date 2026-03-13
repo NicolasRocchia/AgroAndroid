@@ -39,11 +39,21 @@ public interface IAuthService
 {
     Task<bool> IsAuthenticatedAsync();
     Task<LoginResponse?> LoginAsync(string email, string password);
+    Task<RegisterResponse?> RegisterAsync(RegisterRequest request);
     Task LogoutAsync();
     Task<LoginResponse?> GetCachedLoginAsync();
     Task<string?> GetTokenAsync();
     /// <summary>Rol principal del usuario (primer rol de la lista)</summary>
     Task<string?> GetPrimaryRoleAsync();
+
+    /// <summary>GET /api/auth/profile</summary>
+    Task<UserProfileDto?> GetProfileAsync();
+
+    /// <summary>PUT /api/auth/profile</summary>
+    Task<UserProfileDto?> UpdateProfileAsync(UpdateProfileRequest request);
+
+    /// <summary>PUT /api/auth/change-password</summary>
+    Task<bool> ChangePasswordAsync(ChangePasswordRequest request);
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -73,6 +83,9 @@ public interface IExecutionService
 {
     /// <summary>GET /api/executions/my-executions (aplicador)</summary>
     Task<List<ExecutionListDto>> GetMyExecutionsAsync(string? status = null);
+
+    /// <summary>GET /api/executions/my-operator-executions (operario)</summary>
+    Task<List<ExecutionListDto>> GetMyOperatorExecutionsAsync(string? status = null);
 
     /// <summary>GET /api/executions/my-assignments (productor)</summary>
     Task<List<ExecutionListDto>> GetMyAssignmentsAsync(string? status = null);
@@ -181,4 +194,29 @@ public interface ILocationService
 {
     Task<(double Latitude, double Longitude)?> GetCurrentLocationAsync();
     Task<WeatherData?> GetWeatherAsync(double lat, double lng);
+}
+
+// ══════════════════════════════════════════════════════════════
+// OPERARIOS — /api/operators/*
+// ══════════════════════════════════════════════════════════════
+
+public interface IOperatorService
+{
+    /// <summary>GET /api/operators (mis operarios)</summary>
+    Task<List<OperatorListDto>> GetMyOperatorsAsync();
+
+    /// <summary>GET /api/operators/{id}</summary>
+    Task<OperatorDetailDto?> GetDetailAsync(long id);
+
+    /// <summary>POST /api/operators (crear operario → cuenta + password temporal)</summary>
+    Task<CreateOperatorResponse?> CreateAsync(CreateOperatorRequest request);
+
+    /// <summary>PUT /api/operators/{id}</summary>
+    Task<bool> UpdateAsync(long id, UpdateOperatorRequest request);
+
+    /// <summary>POST /api/operators/{id}/deactivate</summary>
+    Task<bool> DeactivateAsync(long id);
+
+    /// <summary>POST /api/executions/{executionId}/assign-operator</summary>
+    Task<bool> AssignToExecutionAsync(long executionId, AssignOperatorRequest request);
 }

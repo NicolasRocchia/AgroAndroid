@@ -106,11 +106,15 @@
                 </VerticalStackLayout>
             </Frame>
 
+            <!-- Cambiar contraseña -->
+            <Button Text="🔒 Cambiar contraseña" Command="{Binding GoToChangePasswordCommand}"
+                    Style="{StaticResource SecondaryButton}" FontSize="15" />
+
             <!-- Cerrar sesión -->
             <Button Text="Cerrar sesión" Command="{Binding LogoutCommand}"
                     BackgroundColor="Transparent" TextColor="{StaticResource Error}"
                     BorderColor="{StaticResource Error}" BorderWidth="1"
-                    CornerRadius="8" Padding="16,12" FontSize="15" Margin="0,10,0,30" />
+                    CornerRadius="8" Padding="16,12" FontSize="15" Margin="0,4,0,30" />
 
         </VerticalStackLayout>
     </ScrollView>

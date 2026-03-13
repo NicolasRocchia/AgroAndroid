@@ -598,3 +598,84 @@ public class ApiErrorResponse
     public string? Error { get; set; }
     public List<string>? Errors { get; set; }
 }
+
+// ══════════════════════════════════════════════════════════════
+// CAMBIAR CONTRASEÑA — PUT /api/auth/change-password
+// ══════════════════════════════════════════════════════════════
+
+public class ChangePasswordRequest
+{
+    public string CurrentPassword { get; set; } = string.Empty;
+    public string NewPassword { get; set; } = string.Empty;
+    public string ConfirmPassword { get; set; } = string.Empty;
+}
+
+// ══════════════════════════════════════════════════════════════
+// EDITAR PERFIL — PUT /api/auth/profile
+// ══════════════════════════════════════════════════════════════
+
+public class UpdateProfileRequest
+{
+    public string UserName { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string? PhoneNumber { get; set; }
+    public string? TaxId { get; set; }
+}
+
+// ══════════════════════════════════════════════════════════════
+// OPERARIOS — /api/operators/*
+// ══════════════════════════════════════════════════════════════
+
+public class OperatorListDto
+{
+    public long Id { get; set; }
+    public long UserId { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string? Phone { get; set; }
+    public bool IsActive { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public int ExecutionsCount { get; set; }
+}
+
+public class OperatorDetailDto
+{
+    public long Id { get; set; }
+    public long UserId { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string? Phone { get; set; }
+    public bool IsActive { get; set; }
+    public DateTime CreatedAt { get; set; }
+}
+
+public class CreateOperatorRequest
+{
+    public string Name { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string? Phone { get; set; }
+}
+
+public class CreateOperatorResponse
+{
+    public OperatorDetailDto? OperatorProfile { get; set; }
+    public string TempPassword { get; set; } = string.Empty;
+}
+
+public class UpdateOperatorRequest
+{
+    public string Name { get; set; } = string.Empty;
+    public string? Phone { get; set; }
+    public bool IsActive { get; set; } = true;
+}
+
+public class AssignOperatorRequest
+{
+    public long OperatorProfileId { get; set; }
+}
+
+/// <summary>Respuesta genérica con mensaje</summary>
+public class MessageResponse
+{
+    public string Message { get; set; } = string.Empty;
+}

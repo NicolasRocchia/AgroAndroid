@@ -13,12 +13,13 @@ public partial class AppShell : Shell
         InitializeComponent();
         _authService = authService;
 
-        // Rutas de detalle (push navigation — nombres planos para evitar conflicto con shell tabs)
+        // Rutas de detalle (push navigation — nombres planos)
         Routing.RegisterRoute("executionDetail", typeof(ExecutionPage));
         Routing.RegisterRoute("executionChecklist", typeof(ExecutionChecklistPage));
+        Routing.RegisterRoute("changePassword", typeof(ChangePasswordPage));
         Routing.RegisterRoute("register", typeof(RegisterPage));
 
-        // Ocultar ambos TabBars al inicio (se muestra el correcto post-login)
+        // Ocultar ambos TabBars al inicio
         ApplicatorTabs.IsVisible = false;
         OperatorTabs.IsVisible = false;
     }

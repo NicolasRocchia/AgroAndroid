@@ -11,8 +11,13 @@ namespace AgroConnect.Mobile.ViewModels.Execution;
 public partial class ExecutionListViewModel : ObservableObject
 {
     private readonly IExecutionService _executions;
+    private readonly IAuthService _auth;
 
-    public ExecutionListViewModel(IExecutionService executions) => _executions = executions;
+    public ExecutionListViewModel(IExecutionService executions, IAuthService auth)
+    {
+        _executions = executions;
+        _auth = auth;
+    }
 
     public ObservableCollection<ExecutionListDto> Executions { get; } = [];
 
@@ -40,7 +45,14 @@ public partial class ExecutionListViewModel : ObservableObject
         try
         {
             IsBusy = true;
-            _allExecutions = await _executions.GetMyExecutionsAsync();
+
+            // Detectar rol para llamar al endpoint correcto
+            var role = await _auth.GetPrimaryRoleAsync();
+            var isOperator = string.Equals(role, "Operario", StringComparison.OrdinalIgnoreCase);
+
+            _allExecutions = isOperator
+                ? await _executions.GetMyOperatorExecutionsAsync()
+                : await _executions.GetMyExecutionsAsync();
 
             CountAll = _allExecutions.Count;
             CountActive = _allExecutions.Count(e => ActiveStatuses.Contains(e.Status));

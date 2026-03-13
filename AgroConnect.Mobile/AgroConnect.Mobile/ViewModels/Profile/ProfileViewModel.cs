@@ -39,7 +39,6 @@ public partial class ProfileViewModel : ObservableObject
         }
         catch (ApiException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
         {
-            // No tiene perfil de aplicador aún
             HasProfile = false;
         }
         catch (ApiException ex)
@@ -67,6 +66,10 @@ public partial class ProfileViewModel : ObservableObject
         await _auth.LogoutAsync();
         await Shell.Current.GoToAsync("//login");
     }
+
+    [RelayCommand]
+    private async Task GoToChangePasswordAsync()
+        => await Shell.Current.GoToAsync("changePassword");
 
     // ── Computed ──
 
