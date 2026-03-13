@@ -15,7 +15,14 @@ public partial class HomePage : ContentPage
     protected override void OnAppearing()
     {
         base.OnAppearing();
-        if (_vm.LoadCommand.CanExecute(null))
-            _vm.LoadCommand.Execute(null);
+        if (!_vm.IsBusy)
+            _ = _vm.LoadCommand.ExecuteAsync(null);
+    }
+
+    private async void OnRefreshing(object? sender, EventArgs e)
+    {
+        await _vm.LoadCommand.ExecuteAsync(null);
+        if (sender is RefreshView rv)
+            rv.IsRefreshing = false;
     }
 }

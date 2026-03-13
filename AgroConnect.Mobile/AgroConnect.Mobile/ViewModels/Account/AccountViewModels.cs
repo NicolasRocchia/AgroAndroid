@@ -8,6 +8,7 @@ namespace AgroConnect.Mobile.ViewModels.Account;
 public partial class LoginViewModel : ObservableObject
 {
     private readonly IAuthService _auth;
+
     public LoginViewModel(IAuthService auth) => _auth = auth;
 
     [ObservableProperty] private string _email = string.Empty;
@@ -30,15 +31,21 @@ public partial class LoginViewModel : ObservableObject
             ErrorMessage = null;
 
             var result = await _auth.LoginAsync(Email.Trim(), Password);
-
             if (result is null)
             {
                 ErrorMessage = "Credenciales inválidas.";
                 return;
             }
 
-            // Login exitoso → ir al tab principal
-            await Shell.Current.GoToAsync("//main/jobs");
+            // Configurar tabs según rol y navegar al Home
+            var shell = Shell.Current as AppShell;
+            if (shell is not null)
+                await shell.ConfigureTabsByRoleAsync();
+
+            var role = await _auth.GetPrimaryRoleAsync();
+            var isOperator = string.Equals(role, "Operario", StringComparison.OrdinalIgnoreCase);
+
+            await Shell.Current.GoToAsync(isOperator ? "//operator/home" : "//main/home");
         }
         catch (ApiException ex)
         {

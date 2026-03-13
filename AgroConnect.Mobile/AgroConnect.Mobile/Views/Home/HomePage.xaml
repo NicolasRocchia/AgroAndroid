@@ -13,7 +13,7 @@
         <conv:IntToBoolConverter x:Key="IntToBool" />
     </ContentPage.Resources>
 
-    <RefreshView Command="{Binding LoadCommand}" IsRefreshing="{Binding IsBusy}">
+    <RefreshView Refreshing="OnRefreshing">
         <ScrollView>
             <VerticalStackLayout Padding="16" Spacing="14">
 
@@ -71,13 +71,10 @@
                         </VerticalStackLayout>
                     </Frame>
 
-                    <!-- Sin leer: col 1 para aplicador, col 0-1 (span) para operario -->
+                    <!-- Sin leer: col 1 para aplicador -->
                     <Frame Grid.Row="1" Padding="14" CornerRadius="12"
                            BackgroundColor="#FCEBEB" BorderColor="#F09595" HasShadow="False"
                            IsVisible="{Binding IsApplicator}">
-                        <Frame.GestureRecognizers>
-                            <TapGestureRecognizer />
-                        </Frame.GestureRecognizers>
                         <VerticalStackLayout Spacing="2">
                             <Label Text="{Binding UnreadNotifications}" FontSize="28" FontAttributes="Bold" TextColor="#791F1F" />
                             <Label Text="Sin leer" FontSize="12" TextColor="#A32D2D" />
