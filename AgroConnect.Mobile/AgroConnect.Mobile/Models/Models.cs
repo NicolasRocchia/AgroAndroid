@@ -634,8 +634,8 @@ public class OperatorListDto
     public string Email { get; set; } = string.Empty;
     public string? Phone { get; set; }
     public bool IsActive { get; set; }
+    public int CompletedExecutions { get; set; }
     public DateTime CreatedAt { get; set; }
-    public int ExecutionsCount { get; set; }
 }
 
 public class OperatorDetailDto
@@ -646,6 +646,8 @@ public class OperatorDetailDto
     public string Email { get; set; } = string.Empty;
     public string? Phone { get; set; }
     public bool IsActive { get; set; }
+    public int CompletedExecutions { get; set; }
+    public int ActiveExecutions { get; set; }
     public DateTime CreatedAt { get; set; }
 }
 

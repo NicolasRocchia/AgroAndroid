@@ -121,11 +121,13 @@ public partial class ExecutionDetailViewModel : ObservableObject
 {
     private readonly IExecutionService _executions;
     private readonly ILocationService _location;
+    private readonly IOperatorService _operators;
 
-    public ExecutionDetailViewModel(IExecutionService executions, ILocationService location)
+    public ExecutionDetailViewModel(IExecutionService executions, ILocationService location, IOperatorService operators)
     {
         _executions = executions;
         _location = location;
+        _operators = operators;
     }
 
     // ── Datos base ──
@@ -318,6 +320,44 @@ public partial class ExecutionDetailViewModel : ObservableObject
     {
         if (!await Confirm("¿Aceptás esta ejecución?")) return;
         await DoTransitionAsync("accept", _executions.AcceptAsync);
+
+        // Después de aceptar, ofrecer asignar operario si tiene
+        if (Execution?.Status?.ToUpperInvariant() != "ACEPTADA") return;
+
+        try
+        {
+            var ops = await _operators.GetMyOperatorsAsync();
+            var activeOps = ops.Where(o => o.IsActive).ToList();
+            if (activeOps.Count == 0) return;
+
+            var names = activeOps.Select(o => o.Name).ToList();
+            names.Insert(0, "Yo mismo (sin operario)");
+
+            var selected = await Shell.Current.DisplayActionSheet(
+                "¿Asignar un operario?", "Cancelar", null, names.ToArray());
+
+            if (string.IsNullOrEmpty(selected)
+                || selected == "Cancelar"
+                || selected == "Yo mismo (sin operario)")
+                return;
+
+            var op = activeOps.FirstOrDefault(o => o.Name == selected);
+            if (op is null) return;
+
+            await _operators.AssignToExecutionAsync(
+                ExecutionId, new AssignOperatorRequest { OperatorProfileId = op.Id });
+
+            // Refrescar detalle para mostrar operario asignado
+            Execution = await _executions.GetDetailAsync(ExecutionId);
+            if (Execution != null) UpdateStateUI();
+        }
+        catch (ApiException ex)
+        {
+            // No bloquear el flujo si falla la asignación de operario
+            await Shell.Current.DisplayAlert("Aviso",
+                $"Se aceptó la ejecución pero no se pudo asignar operario: {ex.Message}", "OK");
+        }
+        catch { /* silently skip */ }
     }
 
     [RelayCommand]
