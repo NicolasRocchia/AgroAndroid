@@ -72,27 +72,29 @@ public static class StatusHelper
         _ => Color.FromArgb("#FFC107")
     };
 
-    // ── Estados de ejecución ──
+    // ── Estados de ejecución (alineados con API) ──
     public static Color GetExecutionStatusColor(string? status) => status?.ToUpperInvariant() switch
     {
-        "ASIGNADA" => Color.FromArgb("#FFC107"),
+        "PENDIENTE" => Color.FromArgb("#FFC107"),
         "ACEPTADA" => Color.FromArgb("#2196F3"),
         "EN_CAMINO" => Color.FromArgb("#03A9F4"),
-        "EN_PROGRESO" => Color.FromArgb("#4CAF50"),
+        "EN_CURSO" => Color.FromArgb("#4CAF50"),
         "PAUSADA" => Color.FromArgb("#FF9800"),
         "COMPLETADA" => Color.FromArgb("#2E7D32"),
+        "COMPLETADA_ADMIN" => Color.FromArgb("#2E7D32"),
         "CANCELADA" => Color.FromArgb("#F44336"),
         _ => Color.FromArgb("#9E9E9E")
     };
 
     public static string GetExecutionStatusLabel(string? status) => status?.ToUpperInvariant() switch
     {
-        "ASIGNADA" => "Asignada",
+        "PENDIENTE" => "Pendiente",
         "ACEPTADA" => "Aceptada",
         "EN_CAMINO" => "En camino",
-        "EN_PROGRESO" => "En progreso",
+        "EN_CURSO" => "En curso",
         "PAUSADA" => "Pausada",
         "COMPLETADA" => "Completada",
+        "COMPLETADA_ADMIN" => "Completada (admin)",
         "CANCELADA" => "Cancelada",
         _ => status ?? "—"
     };
