@@ -97,8 +97,14 @@ public partial class HomeViewModel : ObservableObject
 
     [RelayCommand]
     private async Task GoToExecutionAsync(DashboardExecutionItem item)
-        => await Shell.Current.GoToAsync($"///executions/detail?id={item.Id}");
+        => await Shell.Current.GoToAsync($"executionDetail?id={item.Id}");
 
+    /// <summary>Navegar al tab ejecuciones con filtro activas pre-seleccionado</summary>
+    [RelayCommand]
+    private async Task GoToActiveExecutionsAsync()
+        => await Shell.Current.GoToAsync("///executions?filter=active");
+
+    /// <summary>Navegar al tab ejecuciones sin filtro (todas)</summary>
     [RelayCommand]
     private async Task GoToExecutionsTabAsync()
         => await Shell.Current.GoToAsync("///executions");

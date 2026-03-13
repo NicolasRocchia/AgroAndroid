@@ -71,6 +71,14 @@ public partial class ExecutionListViewModel : ObservableObject
     [RelayCommand]
     private void FilterDone() { SelectedFilter = "done"; ApplyFilter(); }
 
+    /// <summary>Permite setear filtro externamente (ej: desde query param del Home KPI)</summary>
+    public void SetFilter(string filter)
+    {
+        SelectedFilter = filter;
+        if (_allExecutions.Count > 0)
+            ApplyFilter();
+    }
+
     private void ApplyFilter()
     {
         var filtered = SelectedFilter switch

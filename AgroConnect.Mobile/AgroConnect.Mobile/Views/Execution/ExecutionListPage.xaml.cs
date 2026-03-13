@@ -3,10 +3,12 @@ using AgroConnect.Mobile.ViewModels.Execution;
 
 namespace AgroConnect.Mobile.Views.Execution;
 
+[QueryProperty(nameof(Filter), "filter")]
 public partial class ExecutionListPage : ContentPage
 {
     private readonly ExecutionListViewModel _vm;
     private readonly IAuthService _auth;
+    private string? _pendingFilter;
 
     public ExecutionListPage(ExecutionListViewModel vm, IAuthService auth)
     {
@@ -15,12 +17,40 @@ public partial class ExecutionListPage : ContentPage
         _auth = auth;
     }
 
+    /// <summary>Query param "filter" recibido desde navegación (ej: ?filter=active)</summary>
+    public string? Filter
+    {
+        get => _pendingFilter;
+        set => _pendingFilter = value;
+    }
+
     protected override async void OnAppearing()
     {
         base.OnAppearing();
         if (!await _auth.IsAuthenticatedAsync()) return;
-        if (_vm.Executions.Count == 0)
-            _vm.LoadExecutionsCommand.Execute(null);
+
+        // Aplicar filtro pendiente si viene de un KPI del Home
+        var filterToApply = _pendingFilter;
+        _pendingFilter = null; // consumir una sola vez
+
+        if (!string.IsNullOrEmpty(filterToApply))
+        {
+            _vm.SetFilter(filterToApply);
+            UpdateTabStyles(filterToApply);
+        }
+
+        // Siempre recargar datos al aparecer (podría haber cambiado algo)
+        await _vm.LoadExecutionsCommand.ExecuteAsync(null);
+
+        // Reaplicar filtro visual después de cargar datos
+        UpdateTabStyles(_vm.SelectedFilter);
+    }
+
+    private async void OnRefreshing(object? sender, EventArgs e)
+    {
+        await _vm.LoadExecutionsCommand.ExecuteAsync(null);
+        if (sender is RefreshView rv)
+            rv.IsRefreshing = false;
     }
 
     private void OnFilterAll(object? sender, EventArgs e)

@@ -28,7 +28,7 @@
         </HorizontalStackLayout>
 
         <!-- Lista -->
-        <RefreshView Grid.Row="1" Command="{Binding LoadExecutionsCommand}" IsRefreshing="{Binding IsBusy}">
+        <RefreshView x:Name="RefreshContainer" Grid.Row="1" Refreshing="OnRefreshing">
             <CollectionView ItemsSource="{Binding Executions}" SelectionMode="None">
 
                 <CollectionView.EmptyView>
