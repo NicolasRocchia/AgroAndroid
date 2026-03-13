@@ -37,10 +37,13 @@ public partial class LoginViewModel : ObservableObject
                 return;
             }
 
-            // Configurar tabs según rol y navegar al Home
+            // Configurar tabs según rol
             var shell = Shell.Current as AppShell;
             if (shell is not null)
                 await shell.ConfigureTabsByRoleAsync();
+
+            // Esperar a que el UI procese el cambio de visibilidad de tabs
+            await Task.Delay(150);
 
             var role = await _auth.GetPrimaryRoleAsync();
             var isOperator = string.Equals(role, "Operario", StringComparison.OrdinalIgnoreCase);
