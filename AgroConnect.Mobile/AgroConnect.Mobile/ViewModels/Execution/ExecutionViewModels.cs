@@ -84,7 +84,7 @@ public partial class ExecutionListViewModel : ObservableObject
 
     [RelayCommand]
     private async Task GoToDetailAsync(ExecutionListDto execution)
-        => await Shell.Current.GoToAsync($"executions/detail?id={execution.Id}");
+        => await Shell.Current.GoToAsync($"///executions/detail?id={execution.Id}");
 }
 
 // ── Detalle (placeholder para Sprint 2, pero con estructura) ──
