@@ -72,7 +72,7 @@
                     </Frame>
 
                     <!-- Sin leer: col 1 para aplicador -->
-                    <Frame Grid.Row="1" Padding="14" CornerRadius="12"
+                    <Frame Grid.Row="1" Grid.Column="1" Padding="14" CornerRadius="12"
                            BackgroundColor="#FCEBEB" BorderColor="#F09595" HasShadow="False"
                            IsVisible="{Binding IsApplicator}">
                         <VerticalStackLayout Spacing="2">
@@ -117,7 +117,7 @@
                     </Frame>
 
                     <!-- Completado -->
-                    <Frame Padding="10" CornerRadius="8"
+                    <Frame Grid.Column="1" Padding="10" CornerRadius="8"
                            BackgroundColor="{StaticResource Surface}" BorderColor="Transparent" HasShadow="False">
                         <VerticalStackLayout HorizontalOptions="Center" Spacing="2">
                             <Label FontSize="20" FontAttributes="Bold" HorizontalTextAlignment="Center"
@@ -132,7 +132,7 @@
                     </Frame>
 
                     <!-- Hectáreas -->
-                    <Frame Padding="10" CornerRadius="8"
+                    <Frame Grid.Column="2" Padding="10" CornerRadius="8"
                            BackgroundColor="{StaticResource Surface}" BorderColor="Transparent" HasShadow="False">
                         <VerticalStackLayout HorizontalOptions="Center" Spacing="2">
                             <Label Text="{Binding TotalHectaresDisplay}" FontSize="20" FontAttributes="Bold"
