@@ -1,14 +1,35 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<Shell
-    x:Class="AgroConnect.Mobile.AppShell"
-    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:local="clr-namespace:AgroConnect.Mobile"
-    Title="AgroConnect.Mobile">
+<Shell xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+       xmlns:views="clr-namespace:AgroConnect.Mobile.Views.Recipes"
+       xmlns:lotViews="clr-namespace:AgroConnect.Mobile.Views.Lots"
+       xmlns:jobViews="clr-namespace:AgroConnect.Mobile.Views.Jobs"
+       xmlns:profileViews="clr-namespace:AgroConnect.Mobile.Views.Profile"
+       x:Class="AgroConnect.Mobile.AppShell"
+       Shell.FlyoutBehavior="Disabled">
 
-    <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+    <TabBar x:Name="MainTabs" Route="main">
+
+        <ShellContent Title="Recetas"
+                      Icon="icon_recipes.png"
+                      ContentTemplate="{DataTemplate views:RecipeListPage}"
+                      Route="recipes" />
+
+        <ShellContent Title="Lotes"
+                      Icon="icon_lots.png"
+                      ContentTemplate="{DataTemplate lotViews:LotListPage}"
+                      Route="lots" />
+
+        <ShellContent Title="Trabajos"
+                      Icon="icon_jobs.png"
+                      ContentTemplate="{DataTemplate jobViews:JobListPage}"
+                      Route="jobs" />
+
+        <ShellContent Title="Perfil"
+                      Icon="icon_profile.png"
+                      ContentTemplate="{DataTemplate profileViews:ProfilePage}"
+                      Route="profile" />
+
+    </TabBar>
 
 </Shell>

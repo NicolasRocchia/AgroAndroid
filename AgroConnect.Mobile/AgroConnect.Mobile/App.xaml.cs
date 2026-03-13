@@ -1,17 +1,19 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using AgroConnect.Mobile.Services.Interfaces;
 
-namespace AgroConnect.Mobile
+namespace AgroConnect.Mobile;
+
+public partial class App : Application
 {
-    public partial class App : Application
-    {
-        public App()
-        {
-            InitializeComponent();
-        }
+    private readonly IAuthService _authService;
 
-        protected override Window CreateWindow(IActivationState? activationState)
-        {
-            return new Window(new AppShell());
-        }
+    public App(IAuthService authService)
+    {
+        InitializeComponent();
+        _authService = authService;
+    }
+
+    protected override Window CreateWindow(IActivationState? activationState)
+    {
+        return new Window(new AppShell(_authService));
     }
 }

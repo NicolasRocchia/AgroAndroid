@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:AgroConnect.Mobile.ViewModels.Recipes"
+             xmlns:models="clr-namespace:AgroConnect.Mobile.Models"
+             xmlns:conv="clr-namespace:AgroConnect.Mobile.Converters"
+             x:Class="AgroConnect.Mobile.Views.Recipes.RecipeListPage"
+             x:DataType="vm:RecipeListViewModel"
+             Title="Mis Recetas" BackgroundColor="{StaticResource Background}">
+    <ContentPage.Resources>
+        <conv:StatusToColorConverter x:Key="StatusToColor" />
+        <conv:DateToArgentinaConverter x:Key="DateToArg" />
+    </ContentPage.Resources>
+    <RefreshView Command="{Binding LoadRecipesCommand}" IsRefreshing="{Binding IsBusy}">
+        <CollectionView ItemsSource="{Binding Recipes}" RemainingItemsThreshold="5" RemainingItemsThresholdReachedCommand="{Binding LoadMoreCommand}">
+            <CollectionView.EmptyView>
+                <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Padding="30">
+                    <Label Text="No tenés recetas todavía" Style="{StaticResource SubtitleLabel}" HorizontalOptions="Center" />
+                </VerticalStackLayout>
+            </CollectionView.EmptyView>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:RecipeListItem">
+                    <Frame Style="{StaticResource CardFrame}" Margin="16,8">
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:RecipeListViewModel}}, Path=GoToDetailCommand}" CommandParameter="{Binding .}" />
+                        </Frame.GestureRecognizers>
+                        <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="12" RowSpacing="4">
+                            <Label Grid.Row="0" Grid.Column="0" FontAttributes="Bold" FontSize="16">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="{Binding Code}" />
+                                        <Span Text=" · " TextColor="{StaticResource TextSecondary}" />
+                                        <Span Text="{Binding CropName}" TextColor="{StaticResource TextSecondary}" />
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                            <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource StatusBadge}" BackgroundColor="{Binding Status, Converter={StaticResource StatusToColor}}">
+                                <Label Text="{Binding Status}" TextColor="White" FontSize="12" FontAttributes="Bold" />
+                            </Border>
+                            <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding AdvisorName}" Style="{StaticResource CaptionLabel}" />
+                            <Label Grid.Row="2" Grid.Column="0" Text="{Binding ApplicationDate, Converter={StaticResource DateToArg}}" Style="{StaticResource CaptionLabel}" />
+                            <Label Grid.Row="2" Grid.Column="1" Text="{Binding MunicipalityName}" Style="{StaticResource CaptionLabel}" HorizontalTextAlignment="End" />
+                        </Grid>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </RefreshView>
+</ContentPage>
