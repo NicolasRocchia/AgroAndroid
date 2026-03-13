@@ -26,7 +26,11 @@ public partial class ExecutionListViewModel : ObservableObject
 
     private List<ExecutionListDto> _allExecutions = [];
 
-    private static readonly HashSet<string> ActiveStatuses = ["ASIGNADA", "ACEPTADA", "EN_CAMINO", "EN_PROGRESO", "PAUSADA"];
+    private static readonly HashSet<string> ActiveStatuses =
+        ["PENDIENTE", "ACEPTADA", "EN_CAMINO", "EN_CURSO", "PAUSADA"];
+
+    private static readonly HashSet<string> DoneStatuses =
+        ["COMPLETADA", "COMPLETADA_ADMIN", "CANCELADA"];
 
     [RelayCommand]
     private async Task LoadExecutionsAsync()
@@ -39,7 +43,7 @@ public partial class ExecutionListViewModel : ObservableObject
 
             CountAll = _allExecutions.Count;
             CountActive = _allExecutions.Count(e => ActiveStatuses.Contains(e.Status));
-            CountDone = _allExecutions.Count(e => e.Status is "COMPLETADA");
+            CountDone = _allExecutions.Count(e => DoneStatuses.Contains(e.Status));
 
             ApplyFilter();
         }
@@ -71,7 +75,7 @@ public partial class ExecutionListViewModel : ObservableObject
         var filtered = SelectedFilter switch
         {
             "active" => _allExecutions.Where(e => ActiveStatuses.Contains(e.Status)),
-            "done" => _allExecutions.Where(e => e.Status is "COMPLETADA"),
+            "done" => _allExecutions.Where(e => DoneStatuses.Contains(e.Status)),
             _ => _allExecutions.AsEnumerable()
         };
 
