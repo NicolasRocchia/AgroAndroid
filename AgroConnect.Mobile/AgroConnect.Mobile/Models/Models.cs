@@ -506,6 +506,35 @@ public class UnreadCountResponse
 }
 
 // ══════════════════════════════════════════════════════════════
+// PERFIL APLICADOR — /api/applicator/*
+// ══════════════════════════════════════════════════════════════
+
+public class ApplicatorProfileDto
+{
+    public long Id { get; set; }
+    public long UserId { get; set; }
+    public string BusinessName { get; set; } = string.Empty;
+    public string TaxId { get; set; } = string.Empty;
+    public string? ContactPhone { get; set; }
+    public string? ContactEmail { get; set; }
+    public string? Description { get; set; }
+    public List<string> MachineTypes { get; set; } = [];
+    public bool IsVerified { get; set; }
+    public DateTime? VerifiedAt { get; set; }
+    public List<ApplicatorLocationDto> Locations { get; set; } = [];
+}
+
+public class ApplicatorLocationDto
+{
+    public long Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string? Address { get; set; }
+    public decimal Latitude { get; set; }
+    public decimal Longitude { get; set; }
+    public bool IsPrimary { get; set; }
+}
+
+// ══════════════════════════════════════════════════════════════
 // METEO / COMÚN
 // ══════════════════════════════════════════════════════════════
 

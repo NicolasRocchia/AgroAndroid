@@ -38,7 +38,7 @@ public partial class LoginViewModel : ObservableObject
             }
 
             // Login exitoso → ir al tab principal
-            await Shell.Current.GoToAsync("//main/recipes");
+            await Shell.Current.GoToAsync("//main/jobs");
         }
         catch (ApiException ex)
         {

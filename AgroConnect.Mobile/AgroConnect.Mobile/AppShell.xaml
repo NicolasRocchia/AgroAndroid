@@ -1,29 +1,31 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <Shell xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
        xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-       xmlns:views="clr-namespace:AgroConnect.Mobile.Views.Recipes"
-       xmlns:lotViews="clr-namespace:AgroConnect.Mobile.Views.Lots"
        xmlns:jobViews="clr-namespace:AgroConnect.Mobile.Views.Jobs"
+       xmlns:execViews="clr-namespace:AgroConnect.Mobile.Views.Execution"
        xmlns:profileViews="clr-namespace:AgroConnect.Mobile.Views.Profile"
+       xmlns:accountViews="clr-namespace:AgroConnect.Mobile.Views.Account"
        x:Class="AgroConnect.Mobile.AppShell"
        Shell.FlyoutBehavior="Disabled">
 
+    <!-- Login (ruta global //login, sin tabs) -->
+    <ShellContent Route="login"
+                  ContentTemplate="{DataTemplate accountViews:LoginPage}"
+                  Shell.TabBarIsVisible="False"
+                  Shell.NavBarIsVisible="False" />
+
+    <!-- ═══ Tabs Aplicador ═══ -->
     <TabBar x:Name="MainTabs" Route="main">
-
-        <ShellContent Title="Recetas"
-                      Icon="icon_recipes.png"
-                      ContentTemplate="{DataTemplate views:RecipeListPage}"
-                      Route="recipes" />
-
-        <ShellContent Title="Lotes"
-                      Icon="icon_lots.png"
-                      ContentTemplate="{DataTemplate lotViews:LotListPage}"
-                      Route="lots" />
 
         <ShellContent Title="Trabajos"
                       Icon="icon_jobs.png"
                       ContentTemplate="{DataTemplate jobViews:JobListPage}"
                       Route="jobs" />
+
+        <ShellContent Title="Ejecuciones"
+                      Icon="icon_exec.png"
+                      ContentTemplate="{DataTemplate execViews:ExecutionListPage}"
+                      Route="executions" />
 
         <ShellContent Title="Perfil"
                       Icon="icon_profile.png"

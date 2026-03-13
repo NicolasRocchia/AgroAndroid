@@ -1,8 +1,6 @@
 using AgroConnect.Mobile.Services.Interfaces;
 using AgroConnect.Mobile.Views.Account;
-using AgroConnect.Mobile.Views.Recipes;
 using AgroConnect.Mobile.Views.Execution;
-using AgroConnect.Mobile.Views.Lots;
 
 namespace AgroConnect.Mobile;
 
@@ -15,11 +13,8 @@ public partial class AppShell : Shell
         InitializeComponent();
         _authService = authService;
 
-        Routing.RegisterRoute("recipes/detail", typeof(RecipeDetailPage));
-        Routing.RegisterRoute("execution", typeof(ExecutionPage));
-        Routing.RegisterRoute("execution/checklist", typeof(ExecutionChecklistPage));
-        Routing.RegisterRoute("lots/detail", typeof(LotDetailPage));
-        Routing.RegisterRoute("login", typeof(LoginPage));
+        // Rutas de detalle (push navigation)
+        Routing.RegisterRoute("executions/detail", typeof(ExecutionPage));
         Routing.RegisterRoute("register", typeof(RegisterPage));
     }
 
@@ -29,7 +24,10 @@ public partial class AppShell : Shell
 
         if (!await _authService.IsAuthenticatedAsync())
         {
-            await GoToAsync("//login");
+            Dispatcher.Dispatch(async () =>
+            {
+                await GoToAsync("//login");
+            });
         }
     }
 }

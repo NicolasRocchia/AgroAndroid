@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:AgroConnect.Mobile.ViewModels.Execution"
+             xmlns:models="clr-namespace:AgroConnect.Mobile.Models"
+             xmlns:conv="clr-namespace:AgroConnect.Mobile.Converters"
+             x:Class="AgroConnect.Mobile.Views.Execution.ExecutionListPage"
+             x:DataType="vm:ExecutionListViewModel"
+             Title="Ejecuciones" BackgroundColor="{StaticResource Background}">
+    <ContentPage.Resources>
+        <conv:DateToArgentinaConverter x:Key="DateToArg" />
+        <conv:ExecutionStatusToColorConverter x:Key="ExecStatusColor" />
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- Tabs de filtro -->
+        <HorizontalStackLayout Grid.Row="0" Margin="16,12,16,4" Spacing="8">
+            <Button x:Name="BtnAll" Text="📋 Todas"
+                    Clicked="OnFilterAll"
+                    Style="{StaticResource PrimaryButton}" FontSize="12" Padding="14,8" CornerRadius="20" />
+            <Button x:Name="BtnActive" Text="🔵 Activas"
+                    Clicked="OnFilterActive"
+                    Style="{StaticResource SecondaryButton}" FontSize="12" Padding="14,8" CornerRadius="20" />
+            <Button x:Name="BtnDone" Text="✅ Hechas"
+                    Clicked="OnFilterDone"
+                    Style="{StaticResource SecondaryButton}" FontSize="12" Padding="14,8" CornerRadius="20" />
+        </HorizontalStackLayout>
+
+        <!-- Lista -->
+        <RefreshView Grid.Row="1" Command="{Binding LoadExecutionsCommand}" IsRefreshing="{Binding IsBusy}">
+            <CollectionView ItemsSource="{Binding Executions}" SelectionMode="None">
+
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Padding="30" Spacing="8">
+                        <Label Text="🚜" FontSize="48" HorizontalOptions="Center" />
+                        <Label Text="No tenés ejecuciones" Style="{StaticResource SubtitleLabel}" HorizontalOptions="Center" />
+                        <Label Text="Cuando un productor te asigne un trabajo, aparecerá acá."
+                               Style="{StaticResource CaptionLabel}" HorizontalOptions="Center" HorizontalTextAlignment="Center" />
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:ExecutionListDto">
+                        <Frame Style="{StaticResource CardFrame}" Margin="16,6" Padding="0">
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ExecutionListViewModel}}, Path=GoToDetailCommand}"
+                                    CommandParameter="{Binding .}" />
+                            </Frame.GestureRecognizers>
+
+                            <Grid ColumnDefinitions="5,*" Padding="0">
+                                <!-- Barra lateral color estado -->
+                                <BoxView Grid.Column="0"
+                                         WidthRequest="5"
+                                         Color="{Binding Status, Converter={StaticResource ExecStatusColor}}"
+                                         VerticalOptions="Fill"
+                                         HorizontalOptions="Start" />
+
+                                <VerticalStackLayout Grid.Column="1" Padding="14" Spacing="4">
+                                    <!-- Estado + fecha -->
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <Label Grid.Column="0"
+                                               FontSize="13" FontAttributes="Bold"
+                                               TextColor="{Binding Status, Converter={StaticResource ExecStatusColor}}"
+                                               Text="{Binding Status}" />
+                                        <Label Grid.Column="1"
+                                               Text="{Binding CreatedAt, Converter={StaticResource DateToArg}}"
+                                               FontSize="11" TextColor="{StaticResource TextSecondary}" />
+                                    </Grid>
+
+                                    <!-- Receta + cultivo -->
+                                    <Label FontSize="15" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span Text="{Binding RecipePublicCode}" />
+                                                <Span Text=" · " TextColor="{StaticResource TextSecondary}" />
+                                                <Span Text="{Binding Crop, FallbackValue='—'}" TextColor="{StaticResource TextSecondary}" />
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+
+                                    <!-- Productor -->
+                                    <Label FontSize="12" TextColor="{StaticResource TextSecondary}">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span Text="Productor: " />
+                                                <Span Text="{Binding ProducerName}" />
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+
+                                    <!-- Tiempo activo (si tiene) -->
+                                    <HorizontalStackLayout Spacing="12">
+                                        <Label FontSize="11" TextColor="{StaticResource TextSecondary}">
+                                            <Label.FormattedText>
+                                                <FormattedString>
+                                                    <Span Text="⏱️ " />
+                                                    <Span Text="{Binding TotalActiveMinutes, FallbackValue='—'}" />
+                                                    <Span Text=" min" />
+                                                </FormattedString>
+                                            </Label.FormattedText>
+                                        </Label>
+                                    </HorizontalStackLayout>
+                                </VerticalStackLayout>
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+
+    </Grid>
+</ContentPage>

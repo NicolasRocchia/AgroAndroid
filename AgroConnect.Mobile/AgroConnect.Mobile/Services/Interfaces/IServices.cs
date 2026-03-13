@@ -151,6 +151,19 @@ public interface INotificationService
 }
 
 // ══════════════════════════════════════════════════════════════
+// PERFIL APLICADOR — /api/applicator/*
+// ══════════════════════════════════════════════════════════════
+
+public interface IApplicatorService
+{
+    /// <summary>GET /api/applicator/profile</summary>
+    Task<ApplicatorProfileDto?> GetMyProfileAsync();
+
+    /// <summary>GET /api/applicator/has-role</summary>
+    Task<bool> HasApplicatorRoleAsync();
+}
+
+// ══════════════════════════════════════════════════════════════
 // UBICACIÓN + METEO
 // ══════════════════════════════════════════════════════════════
 

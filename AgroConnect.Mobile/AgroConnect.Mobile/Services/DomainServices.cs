@@ -144,3 +144,31 @@ public class NotificationService(IApiService api) : INotificationService
     public async Task MarkAllAsReadAsync()
         => await api.PutAsync("notifications/read-all", new { });
 }
+
+// ══════════════════════════════════════════════════════════════
+// PERFIL APLICADOR
+// Endpoint base: /api/applicator/*
+// ══════════════════════════════════════════════════════════════
+
+public class ApplicatorService(IApiService api) : IApplicatorService
+{
+    public async Task<ApplicatorProfileDto?> GetMyProfileAsync()
+        => await api.GetAsync<ApplicatorProfileDto>("applicator/profile");
+
+    public async Task<bool> HasApplicatorRoleAsync()
+    {
+        try
+        {
+            var result = await api.GetAsync<HasRoleResponse>("applicator/has-role");
+            return result?.HasRole ?? false;
+        }
+        catch { return false; }
+    }
+
+    private class HasRoleResponse
+    {
+        public bool HasRole { get; set; }
+        public bool HasProfile { get; set; }
+        public bool IsVerified { get; set; }
+    }
+}

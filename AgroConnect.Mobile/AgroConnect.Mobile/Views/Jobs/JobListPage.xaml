@@ -1,5 +1,137 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="AgroConnect.Mobile.Views.Jobs.JobListPage" Title="Trabajos" BackgroundColor="{StaticResource Background}">
-    <Label Text="Bolsa de Trabajo — Sprint 2" Style="{StaticResource SubtitleLabel}" VerticalOptions="Center" HorizontalOptions="Center" />
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:AgroConnect.Mobile.ViewModels.Jobs"
+             xmlns:models="clr-namespace:AgroConnect.Mobile.Models"
+             xmlns:conv="clr-namespace:AgroConnect.Mobile.Converters"
+             x:Class="AgroConnect.Mobile.Views.Jobs.JobListPage"
+             x:DataType="vm:JobListViewModel"
+             Title="Trabajos" BackgroundColor="{StaticResource Background}">
+    <ContentPage.Resources>
+        <conv:DateToArgentinaConverter x:Key="DateToArg" />
+    </ContentPage.Resources>
+
+    <RefreshView Command="{Binding LoadJobsCommand}" IsRefreshing="{Binding IsBusy}">
+        <CollectionView ItemsSource="{Binding Jobs}"
+                        SelectionMode="None">
+
+            <!-- Header -->
+            <CollectionView.Header>
+                <VerticalStackLayout Padding="16,16,16,4">
+                    <Label Text="🔍 Bolsa de Trabajo" Style="{StaticResource TitleLabel}" />
+                    <Label Text="Trabajos disponibles ordenados por cercanía"
+                           Style="{StaticResource CaptionLabel}" Margin="0,2,0,8" />
+                </VerticalStackLayout>
+            </CollectionView.Header>
+
+            <!-- Empty -->
+            <CollectionView.EmptyView>
+                <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Padding="30" Spacing="8">
+                    <Label Text="🔍" FontSize="48" HorizontalOptions="Center" />
+                    <Label Text="No hay trabajos disponibles" Style="{StaticResource SubtitleLabel}" HorizontalOptions="Center" />
+                    <Label Text="Cuando un productor publique un trabajo, aparecerá acá."
+                           Style="{StaticResource CaptionLabel}" HorizontalOptions="Center" HorizontalTextAlignment="Center" />
+                </VerticalStackLayout>
+            </CollectionView.EmptyView>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:JobPostingListDto">
+                    <Frame Style="{StaticResource CardFrame}" Margin="16,6" Padding="16">
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:JobListViewModel}}, Path=ApplyToJobCommand}"
+                                CommandParameter="{Binding .}" />
+                        </Frame.GestureRecognizers>
+
+                        <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="12" RowSpacing="4">
+
+                            <!-- Row 0: Título + distancia -->
+                            <Label Grid.Row="0" Grid.Column="0"
+                                   Text="{Binding Title}"
+                                   FontAttributes="Bold" FontSize="15"
+                                   TextColor="{StaticResource TextPrimary}"
+                                   LineBreakMode="TailTruncation" />
+
+                            <VerticalStackLayout Grid.Row="0" Grid.Column="1" Grid.RowSpan="2"
+                                                 HorizontalOptions="End" VerticalOptions="Start" Spacing="0">
+                                <Label FontSize="16" FontAttributes="Bold"
+                                       TextColor="{StaticResource Primary}"
+                                       HorizontalTextAlignment="End">
+                                    <Label.Text>
+                                        <Binding Path="DistanceKm" StringFormat="{}{0:F0} km" FallbackValue="—" />
+                                    </Label.Text>
+                                </Label>
+                                <Label Text="de distancia" FontSize="10"
+                                       TextColor="{StaticResource TextSecondary}"
+                                       HorizontalTextAlignment="End" />
+                            </VerticalStackLayout>
+
+                            <!-- Row 1: Meta (cultivo, superficie, localidad) -->
+                            <HorizontalStackLayout Grid.Row="1" Grid.Column="0" Spacing="12">
+                                <Label FontSize="12" TextColor="{StaticResource TextSecondary}">
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span Text="🌱 " />
+                                            <Span Text="{Binding Crop, FallbackValue='—'}" />
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+                                <Label FontSize="12" TextColor="{StaticResource TextSecondary}">
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span Text="📐 " />
+                                            <Span Text="{Binding SurfaceHa, StringFormat='{0} ha', FallbackValue=''}" />
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+                            </HorizontalStackLayout>
+
+                            <!-- Row 2: Localidad + fecha -->
+                            <HorizontalStackLayout Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Spacing="12">
+                                <Label FontSize="12" TextColor="{StaticResource TextSecondary}">
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span Text="📍 " />
+                                            <Span Text="{Binding Locality, FallbackValue='—'}" />
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+                                <Label FontSize="12" TextColor="{StaticResource TextSecondary}"
+                                       Text="{Binding CreatedAt, Converter={StaticResource DateToArg}}" />
+                            </HorizontalStackLayout>
+
+                            <!-- Row 3: Productor + postulaciones + badge "ya postulado" -->
+                            <HorizontalStackLayout Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Spacing="8" Margin="0,4,0,0">
+                                <Label FontSize="11" TextColor="{StaticResource TextSecondary}">
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span Text="👤 " />
+                                            <Span Text="{Binding ProducerName}" />
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+                                <Label FontSize="11" TextColor="{StaticResource TextSecondary}">
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span Text="📋 " />
+                                            <Span Text="{Binding ApplicationCount}" />
+                                            <Span Text=" postulaciones" />
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+                                <Border IsVisible="{Binding AlreadyApplied}"
+                                        BackgroundColor="#DBEAFE"
+                                        StrokeThickness="0"
+                                        StrokeShape="RoundRectangle 10"
+                                        Padding="8,2">
+                                    <Label Text="✅ Postulado" FontSize="10" FontAttributes="Bold" TextColor="#1E40AF" />
+                                </Border>
+                            </HorizontalStackLayout>
+
+                        </Grid>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </RefreshView>
 </ContentPage>

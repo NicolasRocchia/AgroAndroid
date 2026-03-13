@@ -34,8 +34,7 @@ public class AuthService : IAuthService
             && DateTime.TryParse(expiresStr, out var expires)
             && expires <= DateTime.UtcNow)
         {
-            // Token expirado → limpiar
-            await LogoutAsync();
+            // Token expirado — no limpiar acá, solo reportar
             return false;
         }
 

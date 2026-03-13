@@ -1,5 +1,117 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="AgroConnect.Mobile.Views.Profile.ProfilePage" Title="Mi Perfil" BackgroundColor="{StaticResource Background}">
-    <Label Text="Perfil — Sprint 1" Style="{StaticResource SubtitleLabel}" VerticalOptions="Center" HorizontalOptions="Center" />
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:AgroConnect.Mobile.ViewModels.Profile"
+             xmlns:conv="clr-namespace:AgroConnect.Mobile.Converters"
+             x:Class="AgroConnect.Mobile.Views.Profile.ProfilePage"
+             x:DataType="vm:ProfileViewModel"
+             Title="Mi Perfil" BackgroundColor="{StaticResource Background}">
+    <ContentPage.Resources>
+        <conv:InvertBoolConverter x:Key="InvertBool" />
+        <conv:StringNotNullOrEmptyConverter x:Key="StringNotEmpty" />
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="14">
+
+            <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" HorizontalOptions="Center" Margin="0,30,0,0" />
+
+            <!-- Error -->
+            <Label Text="{Binding ErrorMessage}" TextColor="{StaticResource Error}"
+                   IsVisible="{Binding ErrorMessage, Converter={StaticResource StringNotEmpty}}"
+                   HorizontalOptions="Center" FontSize="14" />
+
+            <!-- ═══ CON PERFIL ═══ -->
+
+            <!-- Header: Avatar + Nombre -->
+            <Frame Style="{StaticResource CardFrame}" IsVisible="{Binding HasProfile}">
+                <HorizontalStackLayout Spacing="14">
+                    <Frame CornerRadius="12" Padding="10" BackgroundColor="#F0FDF4" HasShadow="False" BorderColor="Transparent">
+                        <Label Text="🚜" FontSize="32" />
+                    </Frame>
+                    <VerticalStackLayout VerticalOptions="Center" Spacing="2">
+                        <Label Text="{Binding Profile.BusinessName}" FontSize="18" FontAttributes="Bold"
+                               TextColor="{StaticResource TextPrimary}" LineBreakMode="TailTruncation" />
+                        <Label FontSize="13" TextColor="{StaticResource TextSecondary}">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span Text="CUIT: " />
+                                    <Span Text="{Binding Profile.TaxId}" />
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+                        <Label x:Name="LblVerification" FontSize="12" FontAttributes="Bold" Margin="0,4,0,0" />
+                    </VerticalStackLayout>
+                </HorizontalStackLayout>
+            </Frame>
+
+            <!-- Contacto -->
+            <Frame Style="{StaticResource CardFrame}" IsVisible="{Binding HasProfile}">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="📞 Contacto" FontSize="15" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" />
+                    <BoxView HeightRequest="1" Color="{StaticResource Divider}" />
+                    <Grid ColumnDefinitions="*,*" RowSpacing="8">
+                        <VerticalStackLayout Grid.Column="0">
+                            <Label Text="TELÉFONO" FontSize="10" TextColor="{StaticResource TextSecondary}" />
+                            <Label Text="{Binding Profile.ContactPhone, FallbackValue='—'}"
+                                   FontSize="14" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Grid.Column="1">
+                            <Label Text="EMAIL" FontSize="10" TextColor="{StaticResource TextSecondary}" />
+                            <Label Text="{Binding Profile.ContactEmail, FallbackValue='—'}"
+                                   FontSize="13" TextColor="{StaticResource TextPrimary}" LineBreakMode="TailTruncation" />
+                        </VerticalStackLayout>
+                    </Grid>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Maquinaria -->
+            <Frame Style="{StaticResource CardFrame}" IsVisible="{Binding HasProfile}">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="🔧 Maquinaria" FontSize="15" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" />
+                    <BoxView HeightRequest="1" Color="{StaticResource Divider}" />
+                    <Label Text="{Binding MachinesText}" FontSize="14" TextColor="{StaticResource TextPrimary}" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Descripción -->
+            <Frame Style="{StaticResource CardFrame}" IsVisible="{Binding HasProfile}">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="📝 Descripción" FontSize="15" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" />
+                    <BoxView HeightRequest="1" Color="{StaticResource Divider}" />
+                    <Label Text="{Binding Profile.Description, FallbackValue='Sin descripción.'}"
+                           FontSize="14" TextColor="{StaticResource TextPrimary}" LineBreakMode="WordWrap" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- ═══ SIN PERFIL ═══ -->
+
+            <Frame Style="{StaticResource CardFrame}" IsVisible="{Binding HasProfile, Converter={StaticResource InvertBool}}">
+                <VerticalStackLayout Spacing="10" Padding="10" HorizontalOptions="Center">
+                    <Label Text="🚜" FontSize="48" HorizontalOptions="Center" />
+                    <Label Text="No tenés perfil de aplicador" Style="{StaticResource SubtitleLabel}" HorizontalOptions="Center" />
+                    <Label Text="Creá tu perfil desde la web para aparecer en la bolsa de trabajo."
+                           Style="{StaticResource CaptionLabel}" HorizontalOptions="Center" HorizontalTextAlignment="Center" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- ═══ CUENTA ═══ -->
+
+            <Frame Style="{StaticResource CardFrame}">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="👤 Cuenta" FontSize="15" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" />
+                    <BoxView HeightRequest="1" Color="{StaticResource Divider}" />
+                    <Label FontSize="14" TextColor="{StaticResource TextPrimary}" Text="{Binding User.UserName}" />
+                    <Label FontSize="13" TextColor="{StaticResource TextSecondary}" Text="{Binding User.Email}" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Cerrar sesión -->
+            <Button Text="Cerrar sesión" Command="{Binding LogoutCommand}"
+                    BackgroundColor="Transparent" TextColor="{StaticResource Error}"
+                    BorderColor="{StaticResource Error}" BorderWidth="1"
+                    CornerRadius="8" Padding="16,12" FontSize="15" Margin="0,10,0,30" />
+
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>
