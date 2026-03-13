@@ -546,6 +546,52 @@ public class WeatherData
     public string? WindDirection { get; set; }
 }
 
+// ══════════════════════════════════════════════════════════════
+// DASHBOARD — GET /api/dashboard/applicator
+// ══════════════════════════════════════════════════════════════
+
+public class ApplicatorDashboardDto
+{
+    public string Role { get; set; } = string.Empty;
+    public string DisplayName { get; set; } = string.Empty;
+    public bool IsVerified { get; set; }
+
+    // KPIs principales
+    public int ActiveExecutions { get; set; }
+    public int CompletedExecutions { get; set; }
+    public int AvailableJobs { get; set; }
+    public int UnreadNotifications { get; set; }
+
+    // KPIs reputación
+    public double? AverageRating { get; set; }
+    public double? CompletionRate { get; set; }
+    public decimal TotalHectares { get; set; }
+
+    // Listas top 3
+    public List<DashboardExecutionItem> RecentActiveExecutions { get; set; } = [];
+    public List<DashboardJobItem> NearbyJobs { get; set; } = [];
+}
+
+public class DashboardExecutionItem
+{
+    public long Id { get; set; }
+    public string RecipePublicCode { get; set; } = string.Empty;
+    public string? Crop { get; set; }
+    public decimal? SurfaceHa { get; set; }
+    public string Status { get; set; } = string.Empty;
+    public DateTime CreatedAt { get; set; }
+}
+
+public class DashboardJobItem
+{
+    public long Id { get; set; }
+    public string Title { get; set; } = string.Empty;
+    public string? Crop { get; set; }
+    public decimal? SurfaceHa { get; set; }
+    public string? Locality { get; set; }
+    public double? DistanceKm { get; set; }
+}
+
 /// <summary>Respuesta genérica de error de la API</summary>
 public class ApiErrorResponse
 {

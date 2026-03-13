@@ -164,6 +164,16 @@ public interface IApplicatorService
 }
 
 // ══════════════════════════════════════════════════════════════
+// DASHBOARD — /api/dashboard/*
+// ══════════════════════════════════════════════════════════════
+
+public interface IDashboardService
+{
+    /// <summary>GET /api/dashboard/applicator</summary>
+    Task<ApplicatorDashboardDto?> GetDashboardAsync();
+}
+
+// ══════════════════════════════════════════════════════════════
 // UBICACIÓN + METEO
 // ══════════════════════════════════════════════════════════════
 

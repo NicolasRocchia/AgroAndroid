@@ -49,3 +49,12 @@ public class ExecutionStatusToColorConverter : IValueConverter
     public object? ConvertBack(object? value, Type t, object? p, CultureInfo c)
         => throw new NotImplementedException();
 }
+
+/// <summary>int > 0 → true (para IsVisible de secciones con contadores)</summary>
+public class IntToBoolConverter : IValueConverter
+{
+    public object Convert(object? value, Type t, object? p, CultureInfo c)
+        => value is int n && n > 0;
+    public object ConvertBack(object? value, Type t, object? p, CultureInfo c)
+        => throw new NotImplementedException();
+}

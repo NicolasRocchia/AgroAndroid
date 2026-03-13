@@ -2,10 +2,12 @@ using AgroConnect.Mobile.Services;
 using AgroConnect.Mobile.Services.Interfaces;
 using AgroConnect.Mobile.ViewModels.Account;
 using AgroConnect.Mobile.ViewModels.Execution;
+using AgroConnect.Mobile.ViewModels.Home;
 using AgroConnect.Mobile.ViewModels.Jobs;
 using AgroConnect.Mobile.ViewModels.Profile;
 using AgroConnect.Mobile.Views.Account;
 using AgroConnect.Mobile.Views.Execution;
+using AgroConnect.Mobile.Views.Home;
 using AgroConnect.Mobile.Views.Jobs;
 using AgroConnect.Mobile.Views.Profile;
 using Microsoft.Extensions.Logging;
@@ -33,6 +35,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IConnectivityService, ConnectivityService>();
 
         // ── Services (Transient = nueva instancia por inyección) ──
+        builder.Services.AddTransient<IDashboardService, DashboardService>();
         builder.Services.AddTransient<IJobService, JobService>();
         builder.Services.AddTransient<IExecutionService, ExecutionService>();
         builder.Services.AddTransient<IApplicatorService, ApplicatorService>();
@@ -42,6 +45,7 @@ public static class MauiProgram
         // ── ViewModels ──
         builder.Services.AddTransient<LoginViewModel>();
         builder.Services.AddTransient<RegisterViewModel>();
+        builder.Services.AddTransient<HomeViewModel>();
         builder.Services.AddTransient<JobListViewModel>();
         builder.Services.AddTransient<ExecutionListViewModel>();
         builder.Services.AddTransient<ExecutionDetailViewModel>();
@@ -51,6 +55,7 @@ public static class MauiProgram
         // ── Pages ──
         builder.Services.AddTransient<LoginPage>();
         builder.Services.AddTransient<RegisterPage>();
+        builder.Services.AddTransient<HomePage>();
         builder.Services.AddTransient<JobListPage>();
         builder.Services.AddTransient<ExecutionListPage>();
         builder.Services.AddTransient<ExecutionPage>();          // detalle (push)

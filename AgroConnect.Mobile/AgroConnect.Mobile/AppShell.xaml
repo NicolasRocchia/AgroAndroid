@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <Shell xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
        xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+       xmlns:homeViews="clr-namespace:AgroConnect.Mobile.Views.Home"
        xmlns:jobViews="clr-namespace:AgroConnect.Mobile.Views.Jobs"
        xmlns:execViews="clr-namespace:AgroConnect.Mobile.Views.Execution"
        xmlns:profileViews="clr-namespace:AgroConnect.Mobile.Views.Profile"
@@ -14,8 +15,13 @@
                   Shell.TabBarIsVisible="False"
                   Shell.NavBarIsVisible="False" />
 
-    <!-- ═══ Tabs Aplicador ═══ -->
-    <TabBar x:Name="MainTabs" Route="main">
+    <!-- ═══ Tabs Aplicador (4 tabs) ═══ -->
+    <TabBar x:Name="ApplicatorTabs" Route="main">
+
+        <ShellContent Title="Inicio"
+                      Icon="icon_home.png"
+                      ContentTemplate="{DataTemplate homeViews:HomePage}"
+                      Route="home" />
 
         <ShellContent Title="Trabajos"
                       Icon="icon_jobs.png"
@@ -31,6 +37,21 @@
                       Icon="icon_profile.png"
                       ContentTemplate="{DataTemplate profileViews:ProfilePage}"
                       Route="profile" />
+
+    </TabBar>
+
+    <!-- ═══ Tabs Operario (2 tabs) ═══ -->
+    <TabBar x:Name="OperatorTabs" Route="operator">
+
+        <ShellContent Title="Inicio"
+                      Icon="icon_home.png"
+                      ContentTemplate="{DataTemplate homeViews:HomePage}"
+                      Route="home" />
+
+        <ShellContent Title="Ejecuciones"
+                      Icon="icon_exec.png"
+                      ContentTemplate="{DataTemplate execViews:ExecutionListPage}"
+                      Route="executions" />
 
     </TabBar>
 

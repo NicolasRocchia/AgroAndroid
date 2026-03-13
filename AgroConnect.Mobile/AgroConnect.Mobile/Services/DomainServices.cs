@@ -172,3 +172,15 @@ public class ApplicatorService(IApiService api) : IApplicatorService
         public bool IsVerified { get; set; }
     }
 }
+
+
+// ══════════════════════════════════════════════════════════════
+// DASHBOARD
+// Endpoint base: /api/dashboard/*
+// ══════════════════════════════════════════════════════════════
+
+public class DashboardService(IApiService api) : IDashboardService
+{
+    public async Task<ApplicatorDashboardDto?> GetDashboardAsync()
+        => await api.GetAsync<ApplicatorDashboardDto>("dashboard/applicator");
+}

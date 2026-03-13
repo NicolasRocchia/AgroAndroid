@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:AgroConnect.Mobile.ViewModels.Home"
+             xmlns:models="clr-namespace:AgroConnect.Mobile.Models"
+             xmlns:conv="clr-namespace:AgroConnect.Mobile.Converters"
+             x:Class="AgroConnect.Mobile.Views.Home.HomePage"
+             x:DataType="vm:HomeViewModel"
+             Title="Inicio" BackgroundColor="{StaticResource Background}">
+    <ContentPage.Resources>
+        <conv:DateToArgentinaConverter x:Key="DateToArg" />
+        <conv:ExecutionStatusToColorConverter x:Key="ExecStatusColor" />
+        <conv:IntToBoolConverter x:Key="IntToBool" />
+    </ContentPage.Resources>
+
+    <RefreshView Command="{Binding LoadCommand}" IsRefreshing="{Binding IsBusy}">
+        <ScrollView>
+            <VerticalStackLayout Padding="16" Spacing="14">
+
+                <!-- ═══ Header: saludo + badge ═══ -->
+                <VerticalStackLayout Spacing="2">
+                    <Label Text="Bienvenido" FontSize="13" TextColor="{StaticResource TextSecondary}" />
+                    <HorizontalStackLayout Spacing="8">
+                        <Label Text="{Binding DisplayName}" FontSize="20" FontAttributes="Bold"
+                               TextColor="{StaticResource TextPrimary}" />
+                        <Border IsVisible="{Binding IsVerified}"
+                                BackgroundColor="#DBEAFE" StrokeThickness="0"
+                                StrokeShape="RoundRectangle 10" Padding="8,2">
+                            <Label Text="✅ Verificado" FontSize="11" FontAttributes="Bold" TextColor="#1E40AF" />
+                        </Border>
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+
+                <!-- ═══ KPIs principales (2x2 grid) ═══ -->
+                <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="10" RowSpacing="10">
+
+                    <!-- Activas -->
+                    <Frame Grid.Row="0" Grid.Column="0" Padding="14" CornerRadius="12"
+                           BackgroundColor="#FFF8E1" BorderColor="#FAC775" HasShadow="False">
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding GoToExecutionsTabCommand}" />
+                        </Frame.GestureRecognizers>
+                        <VerticalStackLayout Spacing="2">
+                            <Label Text="{Binding ActiveExecutions}" FontSize="28" FontAttributes="Bold" TextColor="#854F0B" />
+                            <Label Text="Activas" FontSize="12" TextColor="#633806" />
+                        </VerticalStackLayout>
+                    </Frame>
+
+                    <!-- Completadas -->
+                    <Frame Grid.Row="0" Grid.Column="1" Padding="14" CornerRadius="12"
+                           BackgroundColor="#E8F5E9" BorderColor="#97C459" HasShadow="False">
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding GoToExecutionsTabCommand}" />
+                        </Frame.GestureRecognizers>
+                        <VerticalStackLayout Spacing="2">
+                            <Label Text="{Binding CompletedExecutions}" FontSize="28" FontAttributes="Bold" TextColor="#27500A" />
+                            <Label Text="Completadas" FontSize="12" TextColor="#3B6D11" />
+                        </VerticalStackLayout>
+                    </Frame>
+
+                    <!-- Trabajos cerca (solo Aplicador) -->
+                    <Frame Grid.Row="1" Grid.Column="0" Padding="14" CornerRadius="12"
+                           BackgroundColor="#E6F1FB" BorderColor="#85B7EB" HasShadow="False"
+                           IsVisible="{Binding IsApplicator}">
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding GoToJobsTabCommand}" />
+                        </Frame.GestureRecognizers>
+                        <VerticalStackLayout Spacing="2">
+                            <Label Text="{Binding AvailableJobs}" FontSize="28" FontAttributes="Bold" TextColor="#0C447C" />
+                            <Label Text="Trabajos cerca" FontSize="12" TextColor="#185FA5" />
+                        </VerticalStackLayout>
+                    </Frame>
+
+                    <!-- Sin leer: col 1 para aplicador, col 0-1 (span) para operario -->
+                    <Frame Grid.Row="1" Padding="14" CornerRadius="12"
+                           BackgroundColor="#FCEBEB" BorderColor="#F09595" HasShadow="False"
+                           IsVisible="{Binding IsApplicator}">
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer />
+                        </Frame.GestureRecognizers>
+                        <VerticalStackLayout Spacing="2">
+                            <Label Text="{Binding UnreadNotifications}" FontSize="28" FontAttributes="Bold" TextColor="#791F1F" />
+                            <Label Text="Sin leer" FontSize="12" TextColor="#A32D2D" />
+                        </VerticalStackLayout>
+                    </Frame>
+
+                    <!-- Sin leer versión operario (ocupa toda la fila) -->
+                    <Frame Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Padding="14" CornerRadius="12"
+                           BackgroundColor="#FCEBEB" BorderColor="#F09595" HasShadow="False"
+                           IsVisible="{Binding IsOperator}">
+                        <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                            <Label Text="{Binding UnreadNotifications}" FontSize="28" FontAttributes="Bold" TextColor="#791F1F" />
+                            <Label Text="Notificaciones sin leer" FontSize="14" TextColor="#A32D2D" VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+                    </Frame>
+                </Grid>
+
+                <!-- ═══ KPIs reputación (fila horizontal) ═══ -->
+                <Grid ColumnSpacing="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Rating (solo aplicador) -->
+                    <Frame Grid.Column="0" Padding="10" CornerRadius="8"
+                           BackgroundColor="{StaticResource Surface}" BorderColor="Transparent" HasShadow="False"
+                           IsVisible="{Binding IsApplicator}">
+                        <VerticalStackLayout HorizontalOptions="Center" Spacing="2">
+                            <Label FontSize="20" FontAttributes="Bold" HorizontalTextAlignment="Center"
+                                   TextColor="{StaticResource TextPrimary}">
+                                <Label.Text>
+                                    <Binding Path="AverageRating" StringFormat="{}{0:F1}" FallbackValue="—" />
+                                </Label.Text>
+                            </Label>
+                            <Label Text="Rating" FontSize="11" TextColor="{StaticResource TextSecondary}"
+                                   HorizontalTextAlignment="Center" />
+                        </VerticalStackLayout>
+                    </Frame>
+
+                    <!-- Completado -->
+                    <Frame Padding="10" CornerRadius="8"
+                           BackgroundColor="{StaticResource Surface}" BorderColor="Transparent" HasShadow="False">
+                        <VerticalStackLayout HorizontalOptions="Center" Spacing="2">
+                            <Label FontSize="20" FontAttributes="Bold" HorizontalTextAlignment="Center"
+                                   TextColor="{StaticResource TextPrimary}">
+                                <Label.Text>
+                                    <Binding Path="CompletionRate" StringFormat="{}{0:F0}%" FallbackValue="—" />
+                                </Label.Text>
+                            </Label>
+                            <Label Text="Completado" FontSize="11" TextColor="{StaticResource TextSecondary}"
+                                   HorizontalTextAlignment="Center" />
+                        </VerticalStackLayout>
+                    </Frame>
+
+                    <!-- Hectáreas -->
+                    <Frame Padding="10" CornerRadius="8"
+                           BackgroundColor="{StaticResource Surface}" BorderColor="Transparent" HasShadow="False">
+                        <VerticalStackLayout HorizontalOptions="Center" Spacing="2">
+                            <Label Text="{Binding TotalHectaresDisplay}" FontSize="20" FontAttributes="Bold"
+                                   HorizontalTextAlignment="Center" TextColor="{StaticResource TextPrimary}" />
+                            <Label Text="Hectáreas" FontSize="11" TextColor="{StaticResource TextSecondary}"
+                                   HorizontalTextAlignment="Center" />
+                        </VerticalStackLayout>
+                    </Frame>
+                </Grid>
+
+                <!-- ═══ Ejecuciones activas (top 3) ═══ -->
+                <Frame Padding="14" CornerRadius="12" Style="{StaticResource CardFrame}"
+                       IsVisible="{Binding ActiveExecutions, Converter={StaticResource IntToBool}}">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Ejecuciones activas" FontSize="14" FontAttributes="Bold"
+                               TextColor="{StaticResource TextPrimary}" />
+
+                        <CollectionView ItemsSource="{Binding RecentExecutions}" SelectionMode="None">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="models:DashboardExecutionItem">
+                                    <Frame Padding="8,10" CornerRadius="8" Margin="0,2"
+                                           BackgroundColor="{StaticResource Background}" BorderColor="Transparent"
+                                           HasShadow="False">
+                                        <Frame.GestureRecognizers>
+                                            <TapGestureRecognizer
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:HomeViewModel}}, Path=GoToExecutionCommand}"
+                                                CommandParameter="{Binding .}" />
+                                        </Frame.GestureRecognizers>
+                                        <Grid ColumnDefinitions="5,*,Auto" ColumnSpacing="10">
+                                            <BoxView Grid.Column="0" WidthRequest="4" VerticalOptions="Fill"
+                                                     Color="{Binding Status, Converter={StaticResource ExecStatusColor}}"
+                                                     CornerRadius="2" />
+                                            <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                                <Label FontSize="13" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}">
+                                                    <Label.FormattedText>
+                                                        <FormattedString>
+                                                            <Span Text="{Binding RecipePublicCode}" />
+                                                            <Span Text=" - " TextColor="{StaticResource TextSecondary}" />
+                                                            <Span Text="{Binding Crop, FallbackValue='—'}" TextColor="{StaticResource TextSecondary}" />
+                                                        </FormattedString>
+                                                    </Label.FormattedText>
+                                                </Label>
+                                                <Label FontSize="11" TextColor="{StaticResource TextSecondary}">
+                                                    <Label.FormattedText>
+                                                        <FormattedString>
+                                                            <Span Text="{Binding Status}" />
+                                                            <Span Text=" - " />
+                                                            <Span Text="{Binding SurfaceHa, StringFormat='{0} ha', FallbackValue=''}" />
+                                                        </FormattedString>
+                                                    </Label.FormattedText>
+                                                </Label>
+                                            </VerticalStackLayout>
+                                            <Label Grid.Column="2" FontSize="11" VerticalOptions="Center"
+                                                   TextColor="{StaticResource TextSecondary}"
+                                                   Text="{Binding CreatedAt, Converter={StaticResource DateToArg}}" />
+                                        </Grid>
+                                    </Frame>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+
+                        <Button Text="Ver todas mis ejecuciones" FontSize="13"
+                                Style="{StaticResource SecondaryButton}"
+                                Command="{Binding GoToExecutionsTabCommand}" />
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- ═══ Trabajos cercanos (top 3, solo Aplicador) ═══ -->
+                <Frame Padding="14" CornerRadius="12" Style="{StaticResource CardFrame}"
+                       IsVisible="{Binding IsApplicator}">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Trabajos cerca tuyo" FontSize="14" FontAttributes="Bold"
+                               TextColor="{StaticResource TextPrimary}" />
+
+                        <CollectionView ItemsSource="{Binding NearbyJobs}" SelectionMode="None">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="models:DashboardJobItem">
+                                    <Frame Padding="8,10" CornerRadius="8" Margin="0,2"
+                                           BackgroundColor="{StaticResource Background}" BorderColor="Transparent"
+                                           HasShadow="False">
+                                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                                            <VerticalStackLayout Grid.Column="0" Spacing="2">
+                                                <Label Text="{Binding Title}" FontSize="13" FontAttributes="Bold"
+                                                       TextColor="{StaticResource TextPrimary}"
+                                                       LineBreakMode="TailTruncation" />
+                                                <Label FontSize="11" TextColor="{StaticResource TextSecondary}">
+                                                    <Label.FormattedText>
+                                                        <FormattedString>
+                                                            <Span Text="{Binding SurfaceHa, StringFormat='{0} ha', FallbackValue=''}" />
+                                                            <Span Text=" - " />
+                                                            <Span Text="{Binding Locality, FallbackValue='—'}" />
+                                                        </FormattedString>
+                                                    </Label.FormattedText>
+                                                </Label>
+                                            </VerticalStackLayout>
+                                            <Label Grid.Column="1" VerticalOptions="Center"
+                                                   FontSize="14" FontAttributes="Bold" TextColor="#185FA5">
+                                                <Label.Text>
+                                                    <Binding Path="DistanceKm" StringFormat="{}{0:F0} km" FallbackValue="—" />
+                                                </Label.Text>
+                                            </Label>
+                                        </Grid>
+                                    </Frame>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+
+                        <Button Text="Ver bolsa de trabajo" FontSize="13"
+                                Style="{StaticResource SecondaryButton}"
+                                Command="{Binding GoToJobsTabCommand}" />
+                    </VerticalStackLayout>
+                </Frame>
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </RefreshView>
+</ContentPage>
