@@ -1,5 +1,451 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="AgroConnect.Mobile.Views.Execution.ExecutionPage" Title="Ejecución" BackgroundColor="{StaticResource Background}">
-    <Label Text="Ejecución — Sprint 2" Style="{StaticResource SubtitleLabel}" VerticalOptions="Center" HorizontalOptions="Center" />
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:AgroConnect.Mobile.ViewModels.Execution"
+             xmlns:conv="clr-namespace:AgroConnect.Mobile.Converters"
+             x:Class="AgroConnect.Mobile.Views.Execution.ExecutionPage"
+             x:DataType="vm:ExecutionDetailViewModel"
+             Title="Ejecución" BackgroundColor="{StaticResource Background}">
+    <ContentPage.Resources>
+        <conv:DateToArgentinaConverter x:Key="DateToArg" />
+        <conv:InvertBoolConverter x:Key="InvertBool" />
+        <conv:BoolToCheckConverter x:Key="BoolToCheck" />
+    </ContentPage.Resources>
+
+    <!-- Loading overlay -->
+    <Grid>
+        <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}"
+                           VerticalOptions="Center" HorizontalOptions="Center" HeightRequest="40" />
+
+        <ScrollView IsVisible="{Binding IsBusy, Converter={StaticResource InvertBool}}">
+            <VerticalStackLayout Padding="16" Spacing="12">
+
+                <!-- ═══════════════════════════════════════════ -->
+                <!-- HEADER: Estado + código + origen            -->
+                <!-- ═══════════════════════════════════════════ -->
+                <Frame Style="{StaticResource CardFrame}" Padding="16">
+                    <VerticalStackLayout Spacing="8">
+                        <!-- Status badge + origen -->
+                        <Grid ColumnDefinitions="*,Auto">
+                            <HorizontalStackLayout Grid.Column="0" Spacing="8" VerticalOptions="Center">
+                                <Border BackgroundColor="{Binding StatusColor}"
+                                        StrokeThickness="0" StrokeShape="RoundRectangle 10"
+                                        Padding="10,4">
+                                    <Label Text="{Binding StatusLabel}" TextColor="White"
+                                           FontSize="12" FontAttributes="Bold" />
+                                </Border>
+                                <Border BackgroundColor="#E8EAF6" StrokeThickness="0"
+                                        StrokeShape="RoundRectangle 10" Padding="8,4">
+                                    <Label Text="{Binding Execution.Origin}" FontSize="11"
+                                           TextColor="#283593" FontAttributes="Bold" />
+                                </Border>
+                            </HorizontalStackLayout>
+                            <Label Grid.Column="1" Text="{Binding Execution.CreatedAt, Converter={StaticResource DateToArg}}"
+                                   FontSize="11" TextColor="{StaticResource TextSecondary}" VerticalOptions="Center" />
+                        </Grid>
+
+                        <!-- Código receta grande -->
+                        <Label FontSize="22" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span Text="📄 " />
+                                    <Span Text="{Binding Execution.RecipePublicCode}" />
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+
+                        <!-- Cultivo + superficie -->
+                        <HorizontalStackLayout Spacing="16">
+                            <Label FontSize="14" TextColor="{StaticResource TextSecondary}">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="🌾 " />
+                                        <Span Text="{Binding Execution.Crop, FallbackValue='—'}" />
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                            <Label FontSize="14" TextColor="{StaticResource TextSecondary}">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="📐 " />
+                                        <Span Text="{Binding Execution.SurfaceHa, StringFormat='{0:N1} ha'}" />
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                        </HorizontalStackLayout>
+
+                        <!-- Localidad -->
+                        <Label FontSize="13" TextColor="{StaticResource TextSecondary}">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span Text="📍 " />
+                                    <Span Text="{Binding Execution.Locality, FallbackValue='—'}" />
+                                    <Span Text=", " />
+                                    <Span Text="{Binding Execution.Department, FallbackValue=''}" />
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- ═══════════════════════════════════════════ -->
+                <!-- GPS status (durante transición)             -->
+                <!-- ═══════════════════════════════════════════ -->
+                <Frame IsVisible="{Binding IsTransitioning}" Style="{StaticResource CardFrame}"
+                       Padding="12" BackgroundColor="#E3F2FD">
+                    <HorizontalStackLayout Spacing="8" HorizontalOptions="Center">
+                        <ActivityIndicator IsRunning="True" HeightRequest="20" WidthRequest="20"
+                                           Color="{StaticResource Primary}" />
+                        <Label Text="{Binding GpsStatus}" FontSize="13" TextColor="#1565C0"
+                               VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+                </Frame>
+
+                <!-- ═══════════════════════════════════════════ -->
+                <!-- ACCIÓN PRINCIPAL                            -->
+                <!-- ═══════════════════════════════════════════ -->
+                <Button IsVisible="{Binding HasPrimaryAction}"
+                        Text="{Binding PrimaryActionText}"
+                        Command="{Binding PrimaryActionCommand}"
+                        IsEnabled="{Binding IsTransitioning, Converter={StaticResource InvertBool}}"
+                        Style="{StaticResource PrimaryButton}"
+                        FontSize="18" HeightRequest="56" />
+
+                <!-- Botón COMPLETAR (visible solo en EN_CURSO, separado del primario=pausar) -->
+                <Button IsVisible="{Binding CanComplete}"
+                        Text="🏁 Completar aplicación"
+                        Command="{Binding CompleteCommand}"
+                        IsEnabled="{Binding IsTransitioning, Converter={StaticResource InvertBool}}"
+                        BackgroundColor="{StaticResource Success}" TextColor="White"
+                        FontAttributes="Bold" CornerRadius="8" Padding="16,12" FontSize="16"
+                        HeightRequest="52" />
+
+                <!-- Botón CANCELAR -->
+                <Button IsVisible="{Binding CanCancel}"
+                        Text="❌ Cancelar ejecución"
+                        Command="{Binding CancelCommand}"
+                        IsEnabled="{Binding IsTransitioning, Converter={StaticResource InvertBool}}"
+                        BackgroundColor="Transparent" TextColor="{StaticResource Error}"
+                        BorderColor="{StaticResource Error}" BorderWidth="1"
+                        CornerRadius="8" Padding="12,8" FontSize="14" />
+
+                <!-- ═══════════════════════════════════════════ -->
+                <!-- ACTORES: Productor + Aplicador + Operador  -->
+                <!-- ═══════════════════════════════════════════ -->
+                <Frame Style="{StaticResource CardFrame}" Padding="14">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Participantes" FontSize="15" FontAttributes="Bold"
+                               TextColor="{StaticResource TextPrimary}" />
+                        <BoxView HeightRequest="1" Color="{StaticResource Divider}" />
+
+                        <!-- Productor -->
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                            <Label Grid.Column="0" Text="👨‍🌾" FontSize="20" VerticalOptions="Center" />
+                            <VerticalStackLayout Grid.Column="1" Spacing="1">
+                                <Label Text="Productor" FontSize="11" TextColor="{StaticResource TextSecondary}" />
+                                <Label Text="{Binding Execution.ProducerName}" FontSize="14"
+                                       FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" />
+                            </VerticalStackLayout>
+                        </Grid>
+
+                        <!-- Aplicador -->
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                            <Label Grid.Column="0" Text="🚜" FontSize="20" VerticalOptions="Center" />
+                            <VerticalStackLayout Grid.Column="1" Spacing="1">
+                                <Label Text="Aplicador" FontSize="11" TextColor="{StaticResource TextSecondary}" />
+                                <Label Text="{Binding Execution.ApplicatorBusinessName}" FontSize="14"
+                                       FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" />
+                                <Label Text="{Binding Execution.ApplicatorPhone}" FontSize="12"
+                                       TextColor="{StaticResource TextSecondary}" />
+                            </VerticalStackLayout>
+                        </Grid>
+
+                        <!-- Operador (si existe) -->
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10"
+                              IsVisible="{Binding HasOperator}">
+                            <Label Grid.Column="0" Text="👷" FontSize="20" VerticalOptions="Center" />
+                            <VerticalStackLayout Grid.Column="1" Spacing="1">
+                                <Label Text="Operador" FontSize="11" TextColor="{StaticResource TextSecondary}" />
+                                <Label Text="{Binding Execution.Operator.Name}" FontSize="14"
+                                       FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" />
+                                <Label Text="{Binding Execution.Operator.Phone}" FontSize="12"
+                                       TextColor="{StaticResource TextSecondary}" />
+                            </VerticalStackLayout>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- ═══════════════════════════════════════════ -->
+                <!-- TIEMPOS                                     -->
+                <!-- ═══════════════════════════════════════════ -->
+                <Frame Style="{StaticResource CardFrame}" Padding="14"
+                       IsVisible="{Binding IsActive}">
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Tiempos" FontSize="15" FontAttributes="Bold"
+                               TextColor="{StaticResource TextPrimary}" />
+                        <BoxView HeightRequest="1" Color="{StaticResource Divider}" />
+                        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" RowSpacing="4" ColumnSpacing="8">
+                            <VerticalStackLayout Grid.Row="0" Grid.Column="0">
+                                <Label Text="Activo" FontSize="11" TextColor="{StaticResource TextSecondary}" />
+                                <Label FontSize="16" FontAttributes="Bold" TextColor="{StaticResource Primary}">
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span Text="{Binding Execution.TotalActiveMinutes, FallbackValue='—'}" />
+                                            <Span Text=" min" FontSize="12" />
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Grid.Row="0" Grid.Column="1">
+                                <Label Text="Pausas" FontSize="11" TextColor="{StaticResource TextSecondary}" />
+                                <Label FontSize="16" FontAttributes="Bold" TextColor="{StaticResource Accent}">
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span Text="{Binding Execution.TotalPauseMinutes, FallbackValue='—'}" />
+                                            <Span Text=" min" FontSize="12" />
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+                            </VerticalStackLayout>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- Tiempos (terminada) -->
+                <Frame Style="{StaticResource CardFrame}" Padding="14"
+                       IsVisible="{Binding IsFinished}">
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Resumen de tiempos" FontSize="15" FontAttributes="Bold"
+                               TextColor="{StaticResource TextPrimary}" />
+                        <BoxView HeightRequest="1" Color="{StaticResource Divider}" />
+                        <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto"
+                              RowSpacing="4" ColumnSpacing="12">
+                            <Label Grid.Row="0" Grid.Column="0" Text="Inicio:" FontSize="13"
+                                   TextColor="{StaticResource TextSecondary}" />
+                            <Label Grid.Row="0" Grid.Column="1" FontSize="13"
+                                   Text="{Binding Execution.StartedAt, Converter={StaticResource DateToArg}}"
+                                   TextColor="{StaticResource TextPrimary}" />
+
+                            <Label Grid.Row="1" Grid.Column="0" Text="Fin:" FontSize="13"
+                                   TextColor="{StaticResource TextSecondary}" />
+                            <Label Grid.Row="1" Grid.Column="1" FontSize="13"
+                                   Text="{Binding Execution.CompletedAt, Converter={StaticResource DateToArg}}"
+                                   TextColor="{StaticResource TextPrimary}" />
+
+                            <Label Grid.Row="2" Grid.Column="0" Text="T. activo:" FontSize="13"
+                                   TextColor="{StaticResource TextSecondary}" />
+                            <Label Grid.Row="2" Grid.Column="1" FontSize="13" FontAttributes="Bold"
+                                   TextColor="{StaticResource Primary}">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="{Binding Execution.TotalActiveMinutes, FallbackValue='—'}" />
+                                        <Span Text=" min" />
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+
+                            <Label Grid.Row="3" Grid.Column="0" Text="T. pausas:" FontSize="13"
+                                   TextColor="{StaticResource TextSecondary}" />
+                            <Label Grid.Row="3" Grid.Column="1" FontSize="13"
+                                   TextColor="{StaticResource Accent}">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="{Binding Execution.TotalPauseMinutes, FallbackValue='—'}" />
+                                        <Span Text=" min" />
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- ═══════════════════════════════════════════ -->
+                <!-- CHECKLIST (readonly, si ya completado)      -->
+                <!-- ═══════════════════════════════════════════ -->
+                <Frame Style="{StaticResource CardFrame}" Padding="14"
+                       IsVisible="{Binding HasChecklist}">
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="📋 Checklist pre-aplicación" FontSize="15" FontAttributes="Bold"
+                               TextColor="{StaticResource TextPrimary}" />
+                        <BoxView HeightRequest="1" Color="{StaticResource Divider}" />
+
+                        <HorizontalStackLayout Spacing="6">
+                            <Label Text="{Binding Execution.Checklist.EquipmentCalibrated, Converter={StaticResource BoolToCheck}}"
+                                   FontSize="14" />
+                            <Label Text="Equipo calibrado" FontSize="13" VerticalOptions="Center"
+                                   TextColor="{StaticResource TextPrimary}" />
+                        </HorizontalStackLayout>
+                        <HorizontalStackLayout Spacing="6">
+                            <Label Text="{Binding Execution.Checklist.PPEEquipped, Converter={StaticResource BoolToCheck}}"
+                                   FontSize="14" />
+                            <Label Text="EPP colocado" FontSize="13" VerticalOptions="Center"
+                                   TextColor="{StaticResource TextPrimary}" />
+                        </HorizontalStackLayout>
+                        <HorizontalStackLayout Spacing="6">
+                            <Label Text="{Binding Execution.Checklist.MixturePrepared, Converter={StaticResource BoolToCheck}}"
+                                   FontSize="14" />
+                            <Label Text="Mezcla preparada" FontSize="13" VerticalOptions="Center"
+                                   TextColor="{StaticResource TextPrimary}" />
+                        </HorizontalStackLayout>
+                        <HorizontalStackLayout Spacing="6">
+                            <Label Text="{Binding Execution.Checklist.ExclusionZonesVerified, Converter={StaticResource BoolToCheck}}"
+                                   FontSize="14" />
+                            <Label Text="Zonas exclusión verificadas" FontSize="13" VerticalOptions="Center"
+                                   TextColor="{StaticResource TextPrimary}" />
+                        </HorizontalStackLayout>
+                        <HorizontalStackLayout Spacing="6">
+                            <Label Text="{Binding Execution.Checklist.WindConditionsOk, Converter={StaticResource BoolToCheck}}"
+                                   FontSize="14" />
+                            <Label Text="Condiciones de viento OK" FontSize="13" VerticalOptions="Center"
+                                   TextColor="{StaticResource TextPrimary}" />
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- ═══════════════════════════════════════════ -->
+                <!-- METEO                                       -->
+                <!-- ═══════════════════════════════════════════ -->
+                <Frame Style="{StaticResource CardFrame}" Padding="14"
+                       IsVisible="{Binding HasWeatherStart}">
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="🌤️ Condiciones meteorológicas" FontSize="15" FontAttributes="Bold"
+                               TextColor="{StaticResource TextPrimary}" />
+                        <BoxView HeightRequest="1" Color="{StaticResource Divider}" />
+                        <VerticalStackLayout Spacing="2">
+                            <Label Text="Al iniciar:" FontSize="12" TextColor="{StaticResource TextSecondary}" />
+                            <Label Text="{Binding Execution.WeatherAtStart}" FontSize="13"
+                                   TextColor="{StaticResource TextPrimary}" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Spacing="2" IsVisible="{Binding HasWeatherEnd}">
+                            <Label Text="Al finalizar:" FontSize="12" TextColor="{StaticResource TextSecondary}" />
+                            <Label Text="{Binding Execution.WeatherAtEnd}" FontSize="13"
+                                   TextColor="{StaticResource TextPrimary}" />
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- ═══════════════════════════════════════════ -->
+                <!-- REVIEW (si existe)                          -->
+                <!-- ═══════════════════════════════════════════ -->
+                <Frame Style="{StaticResource CardFrame}" Padding="14"
+                       IsVisible="{Binding HasReview}">
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="⭐ Calificación del productor" FontSize="15" FontAttributes="Bold"
+                               TextColor="{StaticResource TextPrimary}" />
+                        <BoxView HeightRequest="1" Color="{StaticResource Divider}" />
+                        <HorizontalStackLayout Spacing="4">
+                            <Label Text="{Binding Execution.Review.Rating, StringFormat='⭐ {0}/5'}"
+                                   FontSize="18" FontAttributes="Bold" TextColor="#F59E0B" />
+                            <Label Text="{Binding Execution.Review.ReviewerName, StringFormat='— {0}'}"
+                                   FontSize="13" TextColor="{StaticResource TextSecondary}"
+                                   VerticalOptions="End" />
+                        </HorizontalStackLayout>
+                        <Label Text="{Binding Execution.Review.Comment}" FontSize="13"
+                               TextColor="{StaticResource TextPrimary}" />
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- ═══════════════════════════════════════════ -->
+                <!-- GPS Inicio / Fin                            -->
+                <!-- ═══════════════════════════════════════════ -->
+                <Frame Style="{StaticResource CardFrame}" Padding="14"
+                       IsVisible="{Binding IsFinished}">
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="📍 Coordenadas GPS" FontSize="15" FontAttributes="Bold"
+                               TextColor="{StaticResource TextPrimary}" />
+                        <BoxView HeightRequest="1" Color="{StaticResource Divider}" />
+                        <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" RowSpacing="4" ColumnSpacing="12">
+                            <Label Grid.Row="0" Grid.Column="0" Text="Inicio:" FontSize="13"
+                                   TextColor="{StaticResource TextSecondary}" />
+                            <Label Grid.Row="0" Grid.Column="1" FontSize="13"
+                                   TextColor="{StaticResource TextPrimary}">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="{Binding Execution.GpsLatStart, StringFormat='{0:F5}'}" />
+                                        <Span Text=", " />
+                                        <Span Text="{Binding Execution.GpsLngStart, StringFormat='{0:F5}'}" />
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                            <Label Grid.Row="1" Grid.Column="0" Text="Fin:" FontSize="13"
+                                   TextColor="{StaticResource TextSecondary}" />
+                            <Label Grid.Row="1" Grid.Column="1" FontSize="13"
+                                   TextColor="{StaticResource TextPrimary}">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="{Binding Execution.GpsLatEnd, StringFormat='{0:F5}'}" />
+                                        <Span Text=", " />
+                                        <Span Text="{Binding Execution.GpsLngEnd, StringFormat='{0:F5}'}" />
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- ═══════════════════════════════════════════ -->
+                <!-- NOTAS                                       -->
+                <!-- ═══════════════════════════════════════════ -->
+                <Frame Style="{StaticResource CardFrame}" Padding="14"
+                       IsVisible="{Binding HasNotes}">
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="📝 Notas" FontSize="15" FontAttributes="Bold"
+                               TextColor="{StaticResource TextPrimary}" />
+                        <BoxView HeightRequest="1" Color="{StaticResource Divider}" />
+                        <Label Text="{Binding Execution.Notes}" FontSize="13"
+                               TextColor="{StaticResource TextPrimary}" />
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- ═══════════════════════════════════════════ -->
+                <!-- TIMELINE DE EVENTOS                         -->
+                <!-- ═══════════════════════════════════════════ -->
+                <Frame Style="{StaticResource CardFrame}" Padding="14"
+                       IsVisible="{Binding HasEvents}">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="📜 Timeline" FontSize="15" FontAttributes="Bold"
+                               TextColor="{StaticResource TextPrimary}" />
+                        <BoxView HeightRequest="1" Color="{StaticResource Divider}" />
+
+                        <CollectionView ItemsSource="{Binding TimelineItems}" SelectionMode="None">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="vm:EventTimelineItem">
+                                    <Grid ColumnDefinitions="32,*" Padding="0,6" ColumnSpacing="8">
+                                        <!-- Icono + línea vertical -->
+                                        <VerticalStackLayout Grid.Column="0" HorizontalOptions="Center">
+                                            <Label Text="{Binding Icon}" FontSize="18"
+                                                   HorizontalOptions="Center" />
+                                            <BoxView WidthRequest="2" HeightRequest="20"
+                                                     Color="{StaticResource Divider}"
+                                                     HorizontalOptions="Center" />
+                                        </VerticalStackLayout>
+
+                                        <!-- Contenido -->
+                                        <VerticalStackLayout Grid.Column="1" Spacing="1">
+                                            <Label Text="{Binding Label}" FontSize="13"
+                                                   FontAttributes="Bold"
+                                                   TextColor="{StaticResource TextPrimary}" />
+                                            <Label Text="{Binding Timestamp}" FontSize="11"
+                                                   TextColor="{StaticResource TextSecondary}" />
+                                            <HorizontalStackLayout Spacing="4"
+                                                                   IsVisible="{Binding HasGps}">
+                                                <Label Text="{Binding GpsText}" FontSize="10"
+                                                       TextColor="{StaticResource TextSecondary}" />
+                                                <Label Text="{Binding DistanceText}" FontSize="10"
+                                                       TextColor="{StaticResource Accent}" />
+                                            </HorizontalStackLayout>
+                                        </VerticalStackLayout>
+                                    </Grid>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- Espaciado final -->
+                <BoxView HeightRequest="20" Color="Transparent" />
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
 </ContentPage>

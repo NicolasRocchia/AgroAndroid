@@ -13,8 +13,9 @@ public partial class AppShell : Shell
         InitializeComponent();
         _authService = authService;
 
-        // Rutas de detalle (push navigation)
-        Routing.RegisterRoute("executions/detail", typeof(ExecutionPage));
+        // Rutas de detalle (push navigation — nombres planos para evitar conflicto con shell tabs)
+        Routing.RegisterRoute("executionDetail", typeof(ExecutionPage));
+        Routing.RegisterRoute("executionChecklist", typeof(ExecutionChecklistPage));
         Routing.RegisterRoute("register", typeof(RegisterPage));
 
         // Ocultar ambos TabBars al inicio (se muestra el correcto post-login)

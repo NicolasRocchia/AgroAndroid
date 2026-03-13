@@ -58,3 +58,12 @@ public class IntToBoolConverter : IValueConverter
     public object ConvertBack(object? value, Type t, object? p, CultureInfo c)
         => throw new NotImplementedException();
 }
+
+/// <summary>bool → "✅" / "❌" para mostrar estado de checklist items</summary>
+public class BoolToCheckConverter : IValueConverter
+{
+    public object Convert(object? value, Type t, object? p, CultureInfo c)
+        => value is true ? "✅" : "❌";
+    public object ConvertBack(object? value, Type t, object? p, CultureInfo c)
+        => throw new NotImplementedException();
+}

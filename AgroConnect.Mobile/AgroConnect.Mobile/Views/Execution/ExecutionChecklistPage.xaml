@@ -1,5 +1,123 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="AgroConnect.Mobile.Views.Execution.ExecutionChecklistPage" Title="Checklist" BackgroundColor="{StaticResource Background}">
-    <Label Text="Checklist — Sprint 2" Style="{StaticResource SubtitleLabel}" VerticalOptions="Center" HorizontalOptions="Center" />
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:AgroConnect.Mobile.ViewModels.Execution"
+             x:Class="AgroConnect.Mobile.Views.Execution.ExecutionChecklistPage"
+             x:DataType="vm:ExecutionChecklistViewModel"
+             Title="Checklist pre-aplicación" BackgroundColor="{StaticResource Background}">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="14">
+
+            <!-- Header -->
+            <Frame Style="{StaticResource CardFrame}" Padding="16" BackgroundColor="#FFF8E1">
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="📋 Checklist obligatorio" FontSize="18" FontAttributes="Bold"
+                           TextColor="#854F0B" />
+                    <Label Text="Verificá todos los ítems antes de iniciar la aplicación. Todos son obligatorios."
+                           FontSize="13" TextColor="#633806" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Items del checklist -->
+            <Frame Style="{StaticResource CardFrame}" Padding="14">
+                <VerticalStackLayout Spacing="14">
+
+                    <!-- 1. Equipo calibrado -->
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                        <Switch Grid.Column="0" IsToggled="{Binding EquipmentCalibrated}"
+                                OnColor="{StaticResource Primary}" VerticalOptions="Center" />
+                        <VerticalStackLayout Grid.Column="1" Spacing="1">
+                            <Label Text="Equipo calibrado" FontSize="15" FontAttributes="Bold"
+                                   TextColor="{StaticResource TextPrimary}" />
+                            <Label Text="El equipo de aplicación está calibrado y en condiciones de uso"
+                                   FontSize="12" TextColor="{StaticResource TextSecondary}" />
+                        </VerticalStackLayout>
+                    </Grid>
+
+                    <BoxView HeightRequest="1" Color="{StaticResource Divider}" />
+
+                    <!-- 2. EPP colocado -->
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                        <Switch Grid.Column="0" IsToggled="{Binding PpeEquipped}"
+                                OnColor="{StaticResource Primary}" VerticalOptions="Center" />
+                        <VerticalStackLayout Grid.Column="1" Spacing="1">
+                            <Label Text="EPP colocado" FontSize="15" FontAttributes="Bold"
+                                   TextColor="{StaticResource TextPrimary}" />
+                            <Label Text="Elementos de protección personal correctamente equipados"
+                                   FontSize="12" TextColor="{StaticResource TextSecondary}" />
+                        </VerticalStackLayout>
+                    </Grid>
+
+                    <BoxView HeightRequest="1" Color="{StaticResource Divider}" />
+
+                    <!-- 3. Mezcla preparada -->
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                        <Switch Grid.Column="0" IsToggled="{Binding MixturePrepared}"
+                                OnColor="{StaticResource Primary}" VerticalOptions="Center" />
+                        <VerticalStackLayout Grid.Column="1" Spacing="1">
+                            <Label Text="Mezcla preparada" FontSize="15" FontAttributes="Bold"
+                                   TextColor="{StaticResource TextPrimary}" />
+                            <Label Text="La mezcla de productos está preparada según la receta"
+                                   FontSize="12" TextColor="{StaticResource TextSecondary}" />
+                        </VerticalStackLayout>
+                    </Grid>
+
+                    <BoxView HeightRequest="1" Color="{StaticResource Divider}" />
+
+                    <!-- 4. Zonas exclusión verificadas -->
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                        <Switch Grid.Column="0" IsToggled="{Binding ExclusionZonesVerified}"
+                                OnColor="{StaticResource Primary}" VerticalOptions="Center" />
+                        <VerticalStackLayout Grid.Column="1" Spacing="1">
+                            <Label Text="Zonas de exclusión verificadas" FontSize="15" FontAttributes="Bold"
+                                   TextColor="{StaticResource TextPrimary}" />
+                            <Label Text="Se verificaron las distancias a zonas sensibles y de exclusión"
+                                   FontSize="12" TextColor="{StaticResource TextSecondary}" />
+                        </VerticalStackLayout>
+                    </Grid>
+
+                    <BoxView HeightRequest="1" Color="{StaticResource Divider}" />
+
+                    <!-- 5. Viento OK -->
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                        <Switch Grid.Column="0" IsToggled="{Binding WindConditionsOk}"
+                                OnColor="{StaticResource Primary}" VerticalOptions="Center" />
+                        <VerticalStackLayout Grid.Column="1" Spacing="1">
+                            <Label Text="Condiciones de viento OK" FontSize="15" FontAttributes="Bold"
+                                   TextColor="{StaticResource TextPrimary}" />
+                            <Label Text="Velocidad y dirección del viento dentro de los rangos permitidos"
+                                   FontSize="12" TextColor="{StaticResource TextSecondary}" />
+                        </VerticalStackLayout>
+                    </Grid>
+
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Notas opcionales -->
+            <Frame Style="{StaticResource CardFrame}" Padding="14">
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="Notas adicionales (opcional)" FontSize="14" FontAttributes="Bold"
+                           TextColor="{StaticResource TextPrimary}" />
+                    <Editor Text="{Binding CustomNotes}" Placeholder="Observaciones adicionales..."
+                            HeightRequest="80" FontSize="14"
+                            TextColor="{StaticResource TextPrimary}" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Botón enviar -->
+            <Button Text="✅ Enviar checklist"
+                    Command="{Binding SubmitCommand}"
+                    IsEnabled="{Binding CanSubmit}"
+                    Style="{StaticResource PrimaryButton}"
+                    FontSize="18" HeightRequest="56" />
+
+            <Label Text="Todos los ítems son obligatorios para poder iniciar la aplicación."
+                   FontSize="11" TextColor="{StaticResource TextSecondary}"
+                   HorizontalOptions="Center" HorizontalTextAlignment="Center" />
+
+            <BoxView HeightRequest="20" Color="Transparent" />
+
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>
